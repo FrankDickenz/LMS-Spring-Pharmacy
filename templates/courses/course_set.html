@@ -1,125 +1,119 @@
-{% load static %}
+<!-- Sticky Top Navigation -->
+<nav
+  id="top-nav"
+  class="bg-white border-b border-gray-200
+         sticky top-0 z-50
+         transition-shadow"
+>
+  <div class="px-4 lg:px-6">
+    <div class="flex items-center justify-between h-14 w-full relative">
 
-<section class="bg-white border border-gray-200 p-3 sm:p-4 lg:p-5 rounded-xl shadow-sm mt-4 mx-2 sm:mx-0">
-  <div class="flex items-center justify-between">
-
-    <!-- JUDUL -->
-    <h3 class="text-lg sm:text-xl font-semibold text-gray-800 border-l-4 border-red-300 pl-2 truncate">
-      <a href="{% url 'courses:studio' course.id %}" class="hover:text-red-600">
-        {{ course.course_name }}
-      </a>
-    </h3>
-
-    <!-- ELLIPSIS -->
-    <div class="relative">
-      <button 
-        id="more-options"
-        class="p-2 sm:p-2.5 rounded-lg hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-200 transition">
-        <i class="fas fa-ellipsis-h text-base sm:text-lg"></i>
-      </button>
-
-      <!-- DROPDOWN -->
-      <div
-        id="dropdown-menu"
-        class="
-          hidden absolute z-50 mt-1
-          w-[85vw] max-w-[260px]
-          right-0
-          bg-white border border-gray-200
-          rounded-lg shadow-lg
-          sm:w-56
-        "
-      >
-        <div class="py-1 text-sm">
-
-          <a href="{% url 'courses:studio' course.id %}" class="dropdown-item">
-            <i class="fas fa-list-ul w-4 text-center"></i>
-            <span>Outline</span>
-          </a>
-
-          <a href="{% url 'instructor:studios' course.id %}" class="dropdown-item">
-            <i class="fas fa-check-circle w-4 text-center"></i>
-            <span>Curation</span>
-          </a>
-
-          <a href="{% url 'courses:course_profile' course.id %}" class="dropdown-item">
-            <i class="fas fa-calendar-alt w-4 text-center"></i>
-            <span>Schedule</span>
-          </a>
-
-          <a href="{% url 'courses:course_grade' course.id %}" class="dropdown-item">
-            <i class="fas fa-chart-line w-4 text-center"></i>
-            <span>Grading</span>
-          </a>
-
-          <a href="{% url 'courses:course_team' course.id %}" class="dropdown-item">
-            <i class="fas fa-users w-4 text-center"></i>
-            <span>Team</span>
-          </a>
-
-          {% if request.user.is_superuser or request.user.is_partner %}
-          <a href="{% url 'courses:course_instructor' course.id %}" class="dropdown-item">
-            <i class="fas fa-chalkboard-teacher w-4 text-center"></i>
-            <span>Instructor</span>
-          </a>
-          {% endif %}
-
-          <a href="{% url 'courses:add_course_price' course.id %}" class="dropdown-item">
-            <i class="fas fa-tag w-4 text-center"></i>
-            <span>Price</span>
-          </a>
-          
-         
-        
-              <a href="{% url 'courses:section_reports_dashboard' course.id %}" class="dropdown-item">
-                  
-                <i class="fas fa-cog w-4 text-center"></i>
-                <span>report</span>
-                </a>
-
-          
+      <!-- LEFT: Logo & Course -->
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <!-- Logo -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <i class="fa-solid fa-graduation-cap text-blue-600 text-xl"></i>
+          <span class="text-lg font-semibold text-gray-900">Studio</span>
         </div>
+
+        <!-- Divider -->
+        <div class="h-6 w-px bg-gray-300"></div>
+
+        <!-- Course -->
+        <div class="min-w-0">
+          <div class="text-xs text-gray-500 uppercase tracking-wide">Course</div>
+          <h1 class="text-sm font-medium text-gray-900 truncate">
+            {{ course.course_name }}
+          </h1>
+        </div>
+      </div>
+
+      <!-- CENTER: Settings Dropdown -->
+      <div class="absolute left-1/2 transform -translate-x-1/2">
+        <div class="relative">
+          <button id="profile-btn" class="flex items-center gap-2 p-2 rounded hover:bg-gray-100">
+            <i class="fa-solid fa-cog text-gray-700"></i>
+            <span class="text-sm font-medium text-gray-900">Settings</span>
+            <i class="fa-solid fa-caret-down text-xs"></i>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="profile-menu" class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-56 bg-white border border-gray-200 rounded shadow-lg hidden">
+            <a href="{% url 'courses:studio' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Outline</a>
+            <a href="{% url 'instructor:studios' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Curations</a>
+            <a href="{% url 'courses:course_profile' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Schedule</a>
+            <a href="{% url 'courses:course_grade' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Grading</a>
+            <a href="{% url 'courses:course_team' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Teams</a>
+            {% if request.user.is_superuser or request.user.is_partner %}
+            <a href="{% url 'courses:course_instructor' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            
+              <span>Instructor</span>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'courses:add_course_price' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              
+              <span>Price</span>
+            </a>
+            
+          
+          
+                <a href="{% url 'courses:section_reports_dashboard' course.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    
+                 
+                  <span>report</span>
+                  </a>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Action Buttons -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button
+          class="px-3 py-1.5 text-xs sm:text-sm font-medium text-gray-700
+                 border border-gray-300 rounded
+                 hover:bg-gray-50 transition
+                 flex items-center gap-1.5"
+        >
+          <i class="fa-solid fa-eye text-xs"></i>
+          <span>View Live</span>
+        </button>
+
+        <button
+          class="px-3 py-1.5 text-xs sm:text-sm font-medium text-white
+                 bg-blue-600 rounded hover:bg-blue-700 transition
+                 flex items-center gap-1.5"
+        >
+          <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+          <span>Publish</span>
+        </button>
+
+        <!-- Mobile Menu Button -->
+        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded md:hidden">
+          <i class="fa-solid fa-bars"></i>
+        </button>
       </div>
     </div>
   </div>
-</section>
+</nav>
 
-<!-- STYLE -->
-<style>
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;          /* lebih rapat */
-  padding: 0.5rem 1rem; /* lebih kompak */
-  color: #374151;
-  font-size: 0.875rem;  /* text-sm */
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.dropdown-item:hover {
-  background-color: #fef2f2;
-  color: #b91c1c;
-}
-</style>
 
-<!-- SCRIPT -->
+
+<!-- JS untuk toggle dropdown -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const btn = document.getElementById('more-options');
-  const menu = document.getElementById('dropdown-menu');
+  const profileBtn = document.getElementById('profile-btn');
+  const profileMenu = document.getElementById('profile-menu');
 
-  btn.addEventListener('click', function (e) {
+  profileBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    menu.classList.toggle('hidden');
+    profileMenu.classList.toggle('hidden');
   });
 
-  document.addEventListener('click', function (e) {
-    if (!menu.contains(e.target) && !btn.contains(e.target)) {
-      menu.classList.add('hidden');
+  // Klik di luar untuk menutup
+  window.addEventListener('click', (e) => {
+    if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+      profileMenu.classList.add('hidden');
     }
   });
-
-  menu.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => menu.classList.add('hidden'));
-  });
-});
 </script>
