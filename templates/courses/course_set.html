@@ -21,9 +21,9 @@
 
         <!-- Course -->
         <div class="min-w-0">
-          <div class="text-xs text-gray-500 uppercase tracking-wide">Course</div>
-          <h1 class="text-sm font-medium text-gray-900 truncate">
-            {{ course.course_name }}
+          <div class="text-xs text-gray-500 uppercase tracking-wide">Course | {{ course.course_number }} | {{ course.course_run }} | {{ course.status_course }}</div>
+          <h1 class="text-sm font-medium text-gray-900 truncate"><a href="{% url 'courses:studio' course.id %}">
+            {{ course.course_name }}</a>
           </h1>
         </div>
       </div>
