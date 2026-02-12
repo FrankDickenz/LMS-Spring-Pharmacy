@@ -2,6 +2,12 @@
 {% get_course_completion_status as completion_status %}
 {% with is_completed=completion_status.is_completed certificate_url=completion.certificate_url assessments_completed_percentage=completion_status.assessments_completed_percentage course_progress=completion_status.course_progress overall_percentage=completion_status.overall_percentage passing_threshold=completion_status.passing_threshold %}
 
+
+
+
+
+
+
 {# ==================== COMPLETION OVERLAY (LULUS) ==================== #}
 {% if not next_url and is_completed %}
 <div id="completion-overlay"

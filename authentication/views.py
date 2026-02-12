@@ -43,7 +43,7 @@ from django.db.models.functions import Coalesce
 from django.core.cache import cache
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
-from decimal import Decimal
+from decimal import Decimal,ROUND_HALF_UP
 from django.urls import reverse
 from django_ratelimit.decorators import ratelimit
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
@@ -145,10 +145,15 @@ def about(request):
 
 logger = logging.getLogger(__name__)
 
+
 @custom_ratelimit
 @login_required
 def mycourse(request):
     user = request.user
+
+    # -----------------------------
+    # Validasi profil lengkap
+    # -----------------------------
     required_fields = {
         'first_name': 'First Name',
         'last_name': 'Last Name',
@@ -159,15 +164,24 @@ def mycourse(request):
     }
     missing_fields = [label for field, label in required_fields.items() if not getattr(user, field)]
     if missing_fields:
-        messages.warning(request, f"Please fill in the following required information: {', '.join(missing_fields)}")
+        messages.warning(
+            request,
+            f"Please fill in the following required information: {', '.join(missing_fields)}"
+        )
         return redirect('authentication:edit-profile', pk=user.pk)
 
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
 
+    # -----------------------------
+    # Query params
+    # -----------------------------
     search_query = request.GET.get('search', '')
     enrollments_page = request.GET.get('enrollments_page', 1)
 
+    # -----------------------------
+    # Ambil enrollments user
+    # -----------------------------
     enrollments = Enrollment.objects.filter(user=user).select_related('course').order_by('-enrolled_at')
     if search_query:
         enrollments = enrollments.filter(
@@ -176,6 +190,9 @@ def mycourse(request):
         )
     total_enrollments = enrollments.count()
 
+    # -----------------------------
+    # Courses aktif & selesai
+    # -----------------------------
     active_courses = Course.objects.filter(
         id__in=enrollments.values('course'),
         status_course__status='published',
@@ -187,128 +204,138 @@ def mycourse(request):
     enrollments_data = []
 
     # -----------------------------
-    # Helper function scoring
+    # Helper: hitung skor assessment sesuai reference
     # -----------------------------
-    def calculate_assessment_score(user, assessment):
-        score_value = Decimal('0')
-        is_submitted = True
-
-        # LTI
-        lti_res = LTIResult.objects.filter(user=user, assessment=assessment).first()
-        if lti_res and lti_res.score is not None:
-            raw_score = Decimal(lti_res.score)
-            if raw_score > 1:
-                raw_score = raw_score / 100
-            score_value = raw_score * Decimal(assessment.weight)
-
-        # In-Video Quiz
-        elif QuizResult.objects.filter(user=user, assessment=assessment).exists():
-            quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).order_by('-created_at').first()
-            if quiz_result and quiz_result.total_questions > 0:
-                raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
-                score_value = raw_percentage * Decimal(assessment.weight)
-            else:
-                is_submitted = False
-
-        # MCQ via AssessmentResult
-        elif AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
-            mcq_result = AssessmentResult.objects.filter(user=user, assessment=assessment).order_by('-submitted_at').first()
-            if mcq_result and mcq_result.total_questions > 0:
-                raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
-                score_value = raw_percentage * Decimal(assessment.weight)
-            elif mcq_result:
-                score_value = (Decimal(mcq_result.score) / 100) * Decimal(assessment.weight)
-            else:
-                is_submitted = False
-
-        # Askora / Essay
+    def calculate_overall(course):
+        # Passing threshold
+        grade_ranges = GradeRange.objects.filter(course=course).order_by('max_grade')
+        if grade_ranges.exists():
+            passing_threshold = Decimal(grade_ranges.first().max_grade) + Decimal(1)
         else:
-            submission = Submission.objects.filter(askora__assessment=assessment, user=user).order_by('-submitted_at').first()
-            if submission:
-                assessment_score = AssessmentScore.objects.filter(submission=submission).first()
-                if assessment_score and assessment_score.final_score is not None:
-                    score_value = (Decimal(assessment_score.final_score) / 100) * Decimal(assessment.weight)
-                else:
-                    is_submitted = False
-            else:
-                is_submitted = False
+            passing_threshold = Decimal('60')
 
-        score_value = min(score_value, Decimal(assessment.weight))
-        return score_value, is_submitted
+        # Course progress
+        course_progress_obj = CourseProgress.objects.filter(user=user, course=course).first()
+        course_progress = Decimal(course_progress_obj.progress_percentage if course_progress_obj else 0).quantize(Decimal("0.01"))
+
+        # Ambil assessments dengan prefetch untuk efisiensi
+        assessments = Assessment.objects.filter(section__courses=course).prefetch_related(
+            Prefetch('ltiresult_set', queryset=LTIResult.objects.filter(user=user).order_by('-id'), to_attr='prefetched_lti_results'),
+            Prefetch('results', queryset=QuizResult.objects.filter(user=user).order_by('-created_at'), to_attr='prefetched_quiz_results'),
+            Prefetch('assessmentresult_set', queryset=AssessmentResult.objects.filter(user=user).order_by('-submitted_at'), to_attr='prefetched_assessment_results')
+        )
+
+        total_score = Decimal('0')
+        total_max_score = Decimal('0')
+        assessments_completed = 0
+        assessment_scores = []
+
+        for a in assessments:
+            weight = Decimal(a.weight or 0)
+            score_value = Decimal('0')
+            submitted = False
+
+            # 1️⃣ LTI
+            lti = getattr(a, 'prefetched_lti_results', [])
+            if lti and lti[0].score is not None:
+                lti_score = Decimal(lti[0].score)
+                if lti_score > 1:
+                    lti_score /= 100
+                score_value = min(lti_score * weight, weight)
+                submitted = True
+            else:
+                # 2️⃣ Quiz
+                qr = getattr(a, 'prefetched_quiz_results', [])
+                if qr and qr[0].total_questions > 0:
+                    qr_frac = Decimal(qr[0].score) / Decimal(qr[0].total_questions)
+                    score_value = min(qr_frac * weight, weight)
+                    submitted = True
+                else:
+                    # 3️⃣ MCQ
+                    ar = getattr(a, 'prefetched_assessment_results', [])
+                    if ar and ar[0].total_questions > 0:
+                        ar_frac = Decimal(ar[0].correct_answers) / Decimal(ar[0].total_questions)
+                        score_value = min(ar_frac * weight, weight)
+                        submitted = True
+                    else:
+                        # 4️⃣ Askora
+                        sub = Submission.objects.filter(askora__assessment=a, user=user).order_by('-submitted_at').first()
+                        if sub:
+                            sc = AssessmentScore.objects.filter(submission=sub).first()
+                            if sc and sc.final_score is not None:
+                                score_value = min(Decimal(sc.final_score), weight)
+                                submitted = True
+
+            if submitted:
+                assessments_completed += 1
+
+            total_score += score_value
+            total_max_score += weight
+
+            assessment_scores.append({
+                'assessment': a,
+                'score': float(score_value.quantize(Decimal("0.01"))),
+                'weight': float(weight),
+                'is_submitted': submitted
+            })
+
+        overall_percentage = (total_score / total_max_score * 100).quantize(Decimal("0.01")) if total_max_score > 0 else Decimal('0')
+        assessments_completed_percentage = (Decimal(assessments_completed)/Decimal(len(assessments))*100).quantize(Decimal("0.01")) if assessments else Decimal('0')
+
+        is_completed = overall_percentage >= passing_threshold
+        certificate_url = reverse('courses:generate_certificate', kwargs={'course_id': course.id}) if is_completed else None
+
+        return {
+            'course_progress': float(course_progress),
+            'overall_percentage': float(overall_percentage),
+            'passing_threshold': float(passing_threshold),
+            'assessments_completed_percentage': float(assessments_completed_percentage),
+            'is_completed': bool(is_completed),
+            'certificate_url': certificate_url,
+            'assessment_scores': assessment_scores
+        }
 
     # -----------------------------
-    # Loop enrollments
+    # Loop semua enrollments
     # -----------------------------
     for enrollment in enrollments:
         course = enrollment.course
 
-        # Material progress
-        materials = Material.objects.filter(section__courses=course)
-        total_materials = materials.count()
-        materials_read = MaterialRead.objects.filter(user=user, material__in=materials).count()
-        materials_read_percentage = (Decimal(materials_read) / Decimal(total_materials) * 100) if total_materials else Decimal('0')
+        course_data = calculate_overall(course)
 
-        # Assessment progress & scoring
-        assessments = Assessment.objects.filter(section__courses=course)
-        total_assessments = assessments.count()
-        assessment_scores = []
-        total_score = Decimal('0')
-        total_max_score = Decimal('0')
-        all_assessments_submitted = True
-        assessments_attempted = []
-
-        for assessment in assessments:
-            score, is_submitted = calculate_assessment_score(user, assessment)
-            assessment_scores.append({'assessment': assessment, 'score': score, 'weight': assessment.weight, 'is_submitted': is_submitted})
-            total_score += score
-            total_max_score += Decimal(assessment.weight)
-            if is_submitted:
-                assessments_attempted.append(assessment.id)
-            else:
-                all_assessments_submitted = False
-
-        assessments_progress = (Decimal(len(assessments_attempted)) / Decimal(total_assessments) * 100) if total_assessments else Decimal('0')
-        progress = (materials_read_percentage + assessments_progress) / 2 if (total_materials + total_assessments) else Decimal('0')
-
-        # Update CourseProgress
-        course_progress, _ = CourseProgress.objects.get_or_create(user=user, course=course)
-        if course_progress.progress_percentage != progress:
-            course_progress.progress_percentage = progress
-            course_progress.save()
-
-        # Calculate final percentage & eligibility
-        overall_percentage = (total_score / total_max_score * 100) if total_max_score else Decimal('0')
-        grade_range = GradeRange.objects.filter(course=course, name='Pass').first()
-        passing_threshold = grade_range.min_grade if grade_range else Decimal('52.00')
-        certificate_eligible = progress == Decimal('100') and overall_percentage >= passing_threshold
+        # Cek issued certificate & review
         certificate_issued = getattr(enrollment, 'certificate_issued', False)
         has_reviewed = CourseRating.objects.filter(user=user, course=course).exists()
 
         enrollments_data.append({
             'enrollment': enrollment,
-            'progress': float(progress),
-            'certificate_eligible': certificate_eligible,
+            'progress': course_data['course_progress'],
+            'overall_percentage': course_data['overall_percentage'],
+            'passing_threshold': course_data['passing_threshold'],
+            'assessments_completed_percentage': course_data['assessments_completed_percentage'],
+            'certificate_eligible': course_data['is_completed'],
+            'certificate_url': course_data['certificate_url'],
             'certificate_issued': certificate_issued,
-            'overall_percentage': float(overall_percentage),
-            'passing_threshold': float(passing_threshold),
-            'assessment_scores': assessment_scores,
             'has_reviewed': has_reviewed,
+            'assessment_scores': course_data['assessment_scores']
         })
 
-    # Paginate
+    # -----------------------------
+    # Pagination
+    # -----------------------------
     enrollments_paginator = Paginator(enrollments_data, 5)
     enrollments_page_obj = enrollments_paginator.get_page(enrollments_page)
 
+    # -----------------------------
     # Last access
+    # -----------------------------
     last_access_list = LastAccessCourse.objects.filter(user=user).select_related('material', 'assessment', 'course')
     last_access_map = {la.course_id: la for la in last_access_list}
 
+    # -----------------------------
     # Recommended courses
+    # -----------------------------
     today = timezone.now().date()
-    user_licenses = user.licenses.all()
-    for lic in user_licenses:
-        lic.is_active = lic.start_date <= today <= lic.expiry_date
-
     user_interests = Subquery(user.interests.values('id'))
     enrolled_course_categories = Subquery(
         Category.objects.filter(category_courses__in=enrollments.values('course')).values('id')
@@ -324,6 +351,9 @@ def mycourse(request):
         id__in=Subquery(enrollments.values('course'))
     ).distinct().order_by('-created_at')[:5]
 
+    # -----------------------------
+    # Render template
+    # -----------------------------
     return render(request, 'learner/mycourse_list.html', {
         'page_obj': enrollments_page_obj,
         'search_query': search_query,
@@ -333,6 +363,7 @@ def mycourse(request):
         'last_access_map': last_access_map,
         'recommended_courses': recommended_courses,
     })
+
 
 @custom_ratelimit
 @login_required
