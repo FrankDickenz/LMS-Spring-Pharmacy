@@ -1,7 +1,7 @@
 from decimal import Decimal, ROUND_HALF_UP
 from courses.models import (
     Assessment, QuestionAnswer, GradeRange,
-    LTIResult, CourseProgress, Quiz, QuizResult,Submission, AssessmentScore
+    LTIResult, CourseProgress, Quiz, QuizResult,Submission, AssessmentScore,AssessmentResult
 )
 from django.core.cache import cache
 import datetime
@@ -9,6 +9,11 @@ import datetime
 import requests
 
 def calculate_course_status(user, course):
+    """
+    Menghitung progress dan skor akhir user pada sebuah course.
+    Mendukung: LTI, In-Video Quiz, MCQ (AssessmentResult), Askora/Essay.
+    Mengembalikan dictionary dengan total_score, overall_percentage, status, dll.
+    """
     total_score = Decimal('0')
     total_max_score = Decimal('0')
     all_assessments_submitted = True
@@ -21,7 +26,7 @@ def calculate_course_status(user, course):
     else:
         passing_threshold = Decimal('60')  # fallback default
 
-    # --- Loop assessments ---
+    # --- Loop semua assessment ---
     assessments = Assessment.objects.filter(section__courses=course)
     for assessment in assessments:
         score_value = Decimal('0')
@@ -38,17 +43,23 @@ def calculate_course_status(user, course):
 
         else:
             # === CASE 2: IN-VIDEO QUIZ ===
-            invideo_quizzes = Quiz.objects.filter(assessment=assessment)
+            invideo_quiz = Quiz.objects.filter(assessment=assessment).exists()
+            if invideo_quiz:
+                quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+                if quiz_result and quiz_result.total_questions > 0:
+                    raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+                    score_value = raw_percentage * weight
+                else:
+                    score_value = Decimal('0')
+                    is_submitted = False
+                    all_assessments_submitted = False
 
-            if invideo_quizzes.exists():
-                quiz_result = QuizResult.objects.filter(
-                    user=user,
-                    assessment=assessment
-                ).first()
-
-                if quiz_result:
-                    if quiz_result.total_questions > 0:
-                        raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+            else:
+                # === CASE 3: MCQ (AssessmentResult) ===
+                mcq_result = AssessmentResult.objects.filter(user=user, assessment=assessment).first()
+                if mcq_result:
+                    if mcq_result.total_questions > 0:
+                        raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
                         score_value = raw_percentage * weight
                     else:
                         score_value = Decimal('0')
@@ -56,73 +67,42 @@ def calculate_course_status(user, course):
                     is_submitted = False
                     all_assessments_submitted = False
 
-            else:
-                # === CASE 3: OLD QUESTION MODEL (Multiple Choice) ===
-                total_questions = assessment.questions.count()
-
-                if total_questions > 0:
-                    total_correct = 0
-                    answers_exist = False
-
-                    for q in assessment.questions.all():
-                        answers = QuestionAnswer.objects.filter(question=q, user=user)
-                        if answers.exists():
-                            answers_exist = True
-                        total_correct += answers.filter(choice__is_correct=True).count()
-
-                    if not answers_exist:
-                        is_submitted = False
-                        all_assessments_submitted = False
-
-                    score_value = (
-                        (Decimal(total_correct) / Decimal(total_questions)) * weight
-                    )
-
-                else:
-                    # === CASE 4: ASKORA ===
-                    askora_submissions = Submission.objects.filter(
-                        askora__assessment=assessment,
-                        user=user
-                    )
-
-                    if not askora_submissions.exists():
-                        is_submitted = False
-                        all_assessments_submitted = False
+                # === CASE 4: ASKORA / Essay ===
+                submissions = Submission.objects.filter(askora__assessment=assessment, user=user)
+                if submissions.exists():
+                    latest_submission = submissions.order_by('-submitted_at').first()
+                    assessment_score = AssessmentScore.objects.filter(submission=latest_submission).first()
+                    if assessment_score and assessment_score.final_score is not None:
+                        score_value = Decimal(assessment_score.final_score)
                     else:
-                        latest_submission = askora_submissions.order_by('-submitted_at').first()
-                        assessment_score = AssessmentScore.objects.filter(
-                            submission=latest_submission
-                        ).first()
+                        is_submitted = False
+                        all_assessments_submitted = False
+                else:
+                    if not mcq_result:
+                        is_submitted = False
+                        all_assessments_submitted = False
 
-                        if assessment_score:
-                            score_value = Decimal(assessment_score.final_score)
-                        else:
-                            is_submitted = False
-                            all_assessments_submitted = False
-
-        # Batas nilai ke bobot
+        # Clamp score agar tidak melebihi bobot
         score_value = min(score_value, weight)
-
         total_score += score_value
         total_max_score += weight
 
-
-    # Normalisasi total skor
+    # --- Hitung persentase akhir ---
     total_score = min(total_score, total_max_score)
     overall_percentage = (total_score / total_max_score * 100) if total_max_score > 0 else Decimal('0')
 
-    # Bulatkan
+    # Round
     total_score = total_score.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     total_max_score = total_max_score.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     overall_percentage = overall_percentage.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    # --- Ambil progress user ---
+    # --- Progress course ---
     course_progress = CourseProgress.objects.filter(user=user, course=course).first()
     progress_percentage = Decimal(course_progress.progress_percentage) if course_progress else Decimal('0')
     progress_percentage = progress_percentage.quantize(Decimal("0.01"))
 
-    # --- Tentukan status kelulusan ---
-    passing_criteria_met = (overall_percentage >= passing_threshold and progress_percentage == 100)
+    # --- Status kelulusan ---
+    passing_criteria_met = overall_percentage >= passing_threshold and progress_percentage == 100
     status = "Pass" if all_assessments_submitted and passing_criteria_met else "Fail"
 
     return {
@@ -134,6 +114,7 @@ def calculate_course_status(user, course):
         'overall_percentage': overall_percentage,
         'passing_threshold': passing_threshold.quantize(Decimal("0.01")),
     }
+
 
 
 

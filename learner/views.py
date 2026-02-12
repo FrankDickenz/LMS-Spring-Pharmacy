@@ -50,7 +50,7 @@ from courses.models import (
     MaterialRead, Payment, PeerReview, Question, QuestionAnswer,LTIResult,
     Score, Section, Submission, UserActivityLog,Certificate, CommentReaction, 
     AttemptedQuestion,LastAccessCourse,CourseSessionLog,QuizResult,Video,Quiz,
-    SectionReport
+    SectionReport,AssessmentResult
 )
 from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
@@ -198,10 +198,18 @@ def my_activity(request):
 
 @login_required
 def score_summary_view_detail(request, course_id):
+    """
+    View untuk admin/instructor/partner melihat ringkasan skor seluruh user di sebuah course.
+    Mendukung:
+        - LTI assessments
+        - In-video quizzes
+        - MCQ (AssessmentResult)
+        - Askora submissions
+    """
     user = request.user
     course = get_object_or_404(Course, id=course_id)
 
-    # === ACCESS VALIDATION ===
+    # === ACCESS CONTROL ===
     allowed_roles = ['curation', 'finance']
 
     is_allowed = (
@@ -211,14 +219,12 @@ def score_summary_view_detail(request, course_id):
         user.groups.filter(name__in=allowed_roles).exists()
     )
 
-    # Partner access
     is_partner_owner = (
         hasattr(user, 'partner_user') and
         course.org_partner and
         course.org_partner.user == user
     )
 
-    # Instructor access
     is_instructor = (
         hasattr(course, 'instructor') and
         course.instructor and
@@ -229,11 +235,11 @@ def score_summary_view_detail(request, course_id):
         messages.error(request, "Access denied.")
         return redirect('authentication:home')
 
-    # All enrolled users
+    # Semua enrolled users di course
     enrollments = course.enrollments.all()
     users = [enrollment.user for enrollment in enrollments]
 
-    # Passing grade threshold
+    # 🔹 Passing grade threshold
     grade_ranges = GradeRange.objects.filter(course=course)
     if grade_ranges.exists():
         grade_fail = grade_ranges.order_by('max_grade').first()
@@ -241,10 +247,11 @@ def score_summary_view_detail(request, course_id):
     else:
         passing_threshold = Decimal('60')
 
-    # Prepare result objects
-    user_scores = []
     assessments = Assessment.objects.filter(section__courses=course)
 
+    user_scores = []
+
+    # 🔹 Loop semua user untuk hitung skor
     for target_user in users:
         assessment_scores = []
         total_max_score = Decimal('0')
@@ -255,7 +262,7 @@ def score_summary_view_detail(request, course_id):
             score_value = Decimal('0')
             is_submitted = True
 
-            # === CASE 1: LTI RESULT ===
+            # === CASE 1: LTI ===
             lti_result = LTIResult.objects.filter(user=target_user, assessment=assessment).first()
             if lti_result and lti_result.score is not None:
                 lti_score = Decimal(lti_result.score)
@@ -264,66 +271,50 @@ def score_summary_view_detail(request, course_id):
                 score_value = lti_score * Decimal(assessment.weight)
 
             else:
-                # >>> IN-VIDEO QUIZ SUPPORT ADDED HERE <<<
-                # Check if this assessment has in-video quizzes
+                # === CASE 2: IN-VIDEO QUIZ ===
                 invideo_quizzes = Quiz.objects.filter(assessment=assessment)
-
                 if invideo_quizzes.exists():
-                    quiz_result = QuizResult.objects.filter(
-                        user=target_user,
-                        assessment=assessment
-                    ).first()
-
-                    if quiz_result:
-                        # Convert score to weight
-                        if quiz_result.total_questions > 0:
-                            raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
-                            score_value = raw_percentage * Decimal(assessment.weight)
-                        else:
-                            score_value = Decimal('0')
+                    quiz_result = QuizResult.objects.filter(user=target_user, assessment=assessment).first()
+                    if quiz_result and quiz_result.total_questions > 0:
+                        raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+                        score_value = raw_percentage * Decimal(assessment.weight)
                     else:
                         is_submitted = False
                         all_assessments_submitted = False
                         score_value = Decimal('0')
 
                 else:
-                    # === CASE 3: OLD QUESTION MODEL ===
-                    total_questions = assessment.questions.count()
-                    if total_questions > 0:
-                        total_correct_answers = 0
-                        answers_exist = False
-                        for question in assessment.questions.all():
-                            answers = QuestionAnswer.objects.filter(question=question, user=target_user)
-                            if answers.exists():
-                                answers_exist = True
-                            total_correct_answers += answers.filter(choice__is_correct=True).count()
-
-                        if not answers_exist:
-                            is_submitted = False
-                            all_assessments_submitted = False
-
-                        score_value = (
-                            (Decimal(total_correct_answers) / Decimal(total_questions)) * Decimal(assessment.weight)
-                            if total_questions > 0 else Decimal('0')
-                        )
+                    # === CASE 3: MCQ (AssessmentResult) ===
+                    mcq_result = AssessmentResult.objects.filter(user=target_user, assessment=assessment).first()
+                    if mcq_result and mcq_result.total_questions > 0:
+                        raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
+                        score_value = raw_percentage * Decimal(assessment.weight)
                     else:
-                        # === CASE 4: ASKORA ===
-                        askora_submissions = Submission.objects.filter(askora__assessment=assessment, user=target_user)
-                        if not askora_submissions.exists():
+                        # Jika tidak ada submission MCQ
+                        is_submitted = False
+                        all_assessments_submitted = False
+                        score_value = Decimal('0')
+
+                    # === CASE 4: ASKORA ===
+                    askora_subs = Submission.objects.filter(askora__assessment=assessment, user=target_user)
+                    if askora_subs.exists():
+                        latest_submission = askora_subs.order_by('-submitted_at').first()
+                        assessment_score = AssessmentScore.objects.filter(submission=latest_submission).first()
+                        if assessment_score:
+                            score_value = Decimal(assessment_score.final_score)
+                        else:
                             is_submitted = False
                             all_assessments_submitted = False
-                        else:
-                            latest_submission = askora_submissions.order_by('-submitted_at').first()
-                            assessment_score = AssessmentScore.objects.filter(submission=latest_submission).first()
-                            if assessment_score:
-                                score_value = Decimal(assessment_score.final_score)
-                            else:
-                                is_submitted = False
-                                all_assessments_submitted = False
+                    else:
+                        # Jika tidak ada submit MCQ maupun Askora
+                        if not mcq_result:
+                            is_submitted = False
+                            all_assessments_submitted = False
 
-            # Clamp score to weight max
+            # Clamp score agar tidak melebihi weight
             score_value = min(score_value, Decimal(assessment.weight))
 
+            # Simpan per-assessment
             assessment_scores.append({
                 'assessment': assessment,
                 'score': score_value,
@@ -331,16 +322,18 @@ def score_summary_view_detail(request, course_id):
                 'is_submitted': is_submitted,
             })
 
+            # Akumulasi total
             total_max_score += Decimal(assessment.weight)
             total_score += score_value
 
-        # Finalization
+        # Finalisasi total
         total_score = min(total_score, total_max_score)
         overall_percentage = (total_score / total_max_score * 100) if total_max_score > 0 else Decimal('0')
 
-        # Pass/Fail
+        # Progress
         course_progress = CourseProgress.objects.filter(user=target_user, course=course).first()
         progress_percentage = course_progress.progress_percentage if course_progress else 0
+
         passing_criteria_met = overall_percentage >= passing_threshold and progress_percentage == 100
         status = "Pass" if all_assessments_submitted and passing_criteria_met else "Fail"
 
@@ -351,20 +344,20 @@ def score_summary_view_detail(request, course_id):
             max_grade__gte=overall_percentage
         ).first()
 
+        # Simpan ke list user
         user_scores.append({
             'user': target_user,
             'assessment_results': [
                 {'name': score['assessment'].name, 'max_score': score['weight'], 'score': score['score']}
                 for score in assessment_scores
-            ] + [
-                {'name': 'Total', 'max_score': total_max_score, 'score': total_score}
-            ],
+            ] + [{'name': 'Total', 'max_score': total_max_score, 'score': total_score}],
             'overall_percentage': round(overall_percentage, 2),
             'status': status,
             'grade': grade_range.name if grade_range else "N/A",
-            'passing_threshold': passing_threshold
+            'passing_threshold': passing_threshold,
         })
 
+    # Render template
     return render(request, 'learner/score_summary_detail.html', {
         'course': course,
         'user_scores': user_scores
@@ -373,18 +366,24 @@ def score_summary_view_detail(request, course_id):
 
 @login_required
 def score_summary_view(request, username, course_id):
+    """
+    View untuk menampilkan ringkasan nilai semua assessment pada sebuah course.
+    Menghitung total score, persentase, status Pass/Fail, dan grade.
+    Mendukung LTI, In-Video Quiz, MCQ, dan Askora submissions.
+    """
     user = request.user
 
-    # Akses hanya boleh diri sendiri
+    # 🛑 Akses hanya untuk user sendiri
     if username != user.username:
         return HttpResponseForbidden("Access denied.")
     if not getattr(user, 'is_learner', False):
         return HttpResponseForbidden("Access denied: learner only.")
 
+    # Ambil course dan semua assessment-nya
     course = get_object_or_404(Course, id=course_id)
     assessments = Assessment.objects.filter(section__courses=course)
 
-    # Passing grade threshold
+    # 🔹 Tentukan passing grade threshold
     grade_ranges = GradeRange.objects.filter(course=course)
     if grade_ranges.exists():
         grade_fail = grade_ranges.order_by('max_grade').first()
@@ -392,36 +391,50 @@ def score_summary_view(request, username, course_id):
     else:
         passing_threshold = Decimal('60')
 
+    # Variabel untuk akumulasi
     assessment_scores = []
     total_max_score = Decimal('0')
     total_score = Decimal('0')
     all_assessments_submitted = True
 
+    # 🔹 Loop semua assessment
     for assessment in assessments:
-        score_value = Decimal('0')
-        is_submitted = True
+        score_value = Decimal('0')  # Default score
+        is_submitted = True          # Default submit status
 
         # === CASE 1: LTI RESULT ===
         lti_result = LTIResult.objects.filter(user=user, assessment=assessment).first()
         if lti_result and lti_result.score is not None:
             lti_score = Decimal(lti_result.score)
+            # Jika score > 1, diasumsikan 0-100, ubah ke 0-1
             if lti_score > 1.0:
                 lti_score = lti_score / 100
+            # Kalikan dengan weight assessment
             score_value = lti_score * Decimal(assessment.weight)
 
         else:
             # === CASE 2: IN-VIDEO QUIZ ===
             invideo_quiz = Quiz.objects.filter(assessment=assessment)
-
             if invideo_quiz.exists():
-                quiz_result = QuizResult.objects.filter(
+                quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+                if quiz_result and quiz_result.total_questions > 0:
+                    raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+                    score_value = raw_percentage * Decimal(assessment.weight)
+                else:
+                    # Belum submit quiz atau total_questions=0
+                    is_submitted = False
+                    all_assessments_submitted = False
+                    score_value = Decimal('0')
+
+            else:
+                # === CASE 3: MCQ / NEW QUESTION MODEL ===
+                mcq_result = AssessmentResult.objects.filter(
                     user=user,
                     assessment=assessment
                 ).first()
-
-                if quiz_result:
-                    if quiz_result.total_questions > 0:
-                        raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+                if mcq_result:
+                    if mcq_result.total_questions > 0:
+                        raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
                         score_value = raw_percentage * Decimal(assessment.weight)
                     else:
                         score_value = Decimal('0')
@@ -430,45 +443,26 @@ def score_summary_view(request, username, course_id):
                     all_assessments_submitted = False
                     score_value = Decimal('0')
 
-            else:
-                # === CASE 3: MCQ / OLD QUESTION MODEL ===
-                total_questions = assessment.questions.count()
-                if total_questions > 0:
-                    total_correct = 0
-                    answers_exist = False
-
-                    for q in assessment.questions.all():
-                        answers = QuestionAnswer.objects.filter(question=q, user=user)
-                        if answers.exists():
-                            answers_exist = True
-                        total_correct += answers.filter(choice__is_correct=True).count()
-
-                    if not answers_exist:
-                        is_submitted = False
-                        all_assessments_submitted = False
-
-                    score_value = (
-                        (Decimal(total_correct) / Decimal(total_questions)) * Decimal(assessment.weight)
-                    ) if total_questions else Decimal('0')
-
-                else:
-                    # === CASE 4: ASKORA ===
-                    askora_sub = Submission.objects.filter(askora__assessment=assessment, user=user)
-                    if askora_sub.exists():
-                        latest = askora_sub.order_by('-submitted_at').first()
-                        score_obj = AssessmentScore.objects.filter(submission=latest).first()
-                        if score_obj:
-                            score_value = Decimal(score_obj.final_score)
-                        else:
-                            is_submitted = False
-                            all_assessments_submitted = False
+                # === CASE 4: ASKORA ===
+                askora_sub = Submission.objects.filter(askora__assessment=assessment, user=user)
+                if askora_sub.exists():
+                    latest = askora_sub.order_by('-submitted_at').first()
+                    score_obj = AssessmentScore.objects.filter(submission=latest).first()
+                    if score_obj:
+                        score_value = Decimal(score_obj.final_score)
                     else:
                         is_submitted = False
                         all_assessments_submitted = False
+                else:
+                    # Jika tidak submit sama sekali
+                    if not mcq_result:
+                        is_submitted = False
+                        all_assessments_submitted = False
 
-        # Clamp score to assessment weight
+        # 🔹 Clamp score agar tidak melebihi weight
         score_value = min(score_value, Decimal(assessment.weight))
 
+        # 🔹 Simpan detail per assessment
         assessment_scores.append({
             'assessment': assessment,
             'score': score_value,
@@ -476,36 +470,42 @@ def score_summary_view(request, username, course_id):
             'is_submitted': is_submitted,
         })
 
+        # 🔹 Akumulasi total
         total_max_score += Decimal(assessment.weight)
         total_score += score_value
 
-    # Finalize total
+    # 🔹 Hitung total dan persentase akhir
     total_score = min(total_score, total_max_score)
-    overall_percentage = (
-        total_score / total_max_score * 100
-    ) if total_max_score > 0 else Decimal('0')
+    overall_percentage = (total_score / total_max_score * 100) if total_max_score > 0 else Decimal('0')
 
-    # Progress
+    # 🔹 Progress course
     course_progress = CourseProgress.objects.filter(user=user, course=course).first()
     progress_percentage = Decimal(course_progress.progress_percentage) if course_progress else Decimal('0')
 
+    # 🔹 Tentukan status Pass/Fail
     passing_criteria_met = overall_percentage >= passing_threshold and progress_percentage == 100
     status = "Pass" if all_assessments_submitted and passing_criteria_met else "Fail"
 
-    # Grade Letter
+    # 🔹 Tentukan grade letter
     grade_range = GradeRange.objects.filter(
         course=course,
         min_grade__lte=overall_percentage,
         max_grade__gte=overall_percentage
     ).first()
 
-    # Output to template
+    # 🔹 Siapkan data untuk template
     assessment_results = [
-        {'name': score['assessment'].name, 'max_score': score['weight'], 'score': score['score']}
+        {
+            'name': score['assessment'].name,
+            'max_score': score['weight'],
+            'score': score['score']
+        }
         for score in assessment_scores
     ]
+    # Tambahkan total
     assessment_results.append({'name': 'Total', 'max_score': total_max_score, 'score': total_score})
 
+    # 🔹 Render template
     return render(request, 'learner/score_summary.html', {
         'course': course,
         'username': user.username,
@@ -516,6 +516,7 @@ def score_summary_view(request, username, course_id):
         'passing_threshold': passing_threshold,
         'progress_percentage': progress_percentage,
     })
+
 
 
 
@@ -1859,31 +1860,44 @@ def start_assessment_courses(request, assessment_id):
 @login_required
 def submit_assessment_new(request, assessment_id):
     """
-    Submit an assessment and end the session.
+    Submit an assessment, save user answers, end the session, 
+    calculate score, and save it in AssessmentResult.
     """
+    # ✅ Pastikan request POST
     if request.method != 'POST':
         logger.warning(f"Invalid request method: {request.method} for submit_assessment_new")
-        return render(request, 'learner/partials/error.html', {
-            'error_message': 'Permintaan tidak valid.'
-        }, status=400) if request.headers.get('HX-Request') == 'true' else HttpResponse(status=400)
+        if request.headers.get('HX-Request') == 'true':
+            return render(request, 'learner/partials/error.html', {
+                'error_message': 'Permintaan tidak valid.'
+            }, status=400)
+        return HttpResponse(status=400)
 
-    assessment = get_object_or_404(Assessment.objects.select_related('section__courses'), id=assessment_id)
+    # ✅ Ambil assessment dan course terkait
+    assessment = get_object_or_404(
+        Assessment.objects.select_related('section__courses'),
+        id=assessment_id
+    )
     course = assessment.section.courses
-    session = AssessmentSession.objects.filter(user=request.user, assessment=assessment).first()
 
+    # ✅ Ambil session user saat ini
+    session = AssessmentSession.objects.filter(user=request.user, assessment=assessment).first()
     if not session:
         logger.error(f"No session found for user {request.user.username}, assessment {assessment_id}")
-        return render(request, 'learner/partials/error.html', {
-            'error_message': 'Sesi penilaian tidak ditemukan.'
-        }, status=400) if request.headers.get('HX-Request') == 'true' else HttpResponse(status=400)
+        if request.headers.get('HX-Request') == 'true':
+            return render(request, 'learner/partials/error.html', {
+                'error_message': 'Sesi penilaian tidak ditemukan.'
+            }, status=400)
+        return HttpResponse(status=400)
 
     # ⬇️ SIMPAN JAWABAN PILIHAN GANDA
+    # Ambil semua POST yang mulai dengan 'answers_'
     answers = {
         key.split('_')[1]: value
         for key, value in request.POST.items()
         if key.startswith('answers_')
     }
 
+    # Loop jawaban, simpan/update QuestionAnswer
     for question_id, choice_id in answers.items():
         try:
             question = Question.objects.get(id=question_id, assessment=assessment)
@@ -1898,13 +1912,35 @@ def submit_assessment_new(request, assessment_id):
             logger.warning(f"Invalid answer data for question {question_id}: {e}")
             continue
 
-    # ⬇️ SIMPAN AKHIR SESI
+    # ⬇️ AKHIR SESI
     session.end_time = timezone.now()
     session.save()
 
     logger.debug(f"Assessment submitted for user {request.user.username}, assessment {assessment_id}")
-    
-    # ⬇️ BANGUN KONTEN
+
+    # ⬇️ HITUNG NILAI OTOMATIS
+    answers_qs = QuestionAnswer.objects.filter(
+        user=request.user,
+        question__assessment=assessment
+    ).select_related('question', 'choice')
+
+    total_questions = assessment.questions.count()
+    correct_answers = sum(1 for answer in answers_qs if answer.choice.is_correct)
+    percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
+
+    # ⬇️ SIMPAN HASIL KE AssessmentResult
+    AssessmentResult.objects.update_or_create(
+        user=request.user,
+        assessment=assessment,
+        session=session,
+        defaults={
+            'total_questions': total_questions,
+            'correct_answers': correct_answers,
+            'score': percentage,
+        }
+    )
+
+    # ⬇️ BANGUN CONTEXT UNTUK TEMPLATE
     context = {
         'course': course,
         'course_name': course.course_name,
@@ -1921,23 +1957,33 @@ def submit_assessment_new(request, assessment_id):
         'is_expired': True,
         'remaining_time': 0,
         'answered_questions': {
-            answer.question.id: answer for answer in QuestionAnswer.objects.filter(
-                user=request.user, question__assessment=assessment
-            ).select_related('question', 'choice')
+            answer.question.id: answer for answer in answers_qs
         },
         'course_progress': CourseProgress.objects.get_or_create(user=request.user, course=course)[0].progress_percentage,
         'previous_url': None,
         'next_url': None,
+        'assessment_result': AssessmentResult.objects.get(
+            user=request.user,
+            assessment=assessment,
+            session=session
+        ),
     }
 
-    # Tambahan jika Anda punya helper
+    # Tambahan helper context jika ada
     context.update(_build_assessment_context(assessment, request.user))
     context['can_review'] = bool(context['submissions'])
 
+    # ⬇️ Bangun navigasi previous/next
     combined_content = _build_combined_content(context['sections'])
-    current_index = next((i for i, c in enumerate(combined_content) if c[0] == 'assessment' and c[1].id == assessment_id), 0)
-    context['previous_url'], context['next_url'] = _get_navigation_urls(request.user.username, course.id, course.slug, combined_content, current_index)
+    current_index = next(
+        (i for i, c in enumerate(combined_content) if c[0] == 'assessment' and c[1].id == assessment_id),
+        0
+    )
+    context['previous_url'], context['next_url'] = _get_navigation_urls(
+        request.user.username, course.id, course.slug, combined_content, current_index
+    )
 
+    # ⬇️ HANDLE HTMX REQUEST
     is_htmx = request.headers.get('HX-Request') == 'true'
     if not is_htmx:
         redirect_url = reverse('learner:load_content', kwargs={
@@ -1949,6 +1995,7 @@ def submit_assessment_new(request, assessment_id):
         logger.info(f"Redirecting non-HTMX request to: {redirect_url}")
         return HttpResponseRedirect(redirect_url)
 
+    # ⬇️ Render HTMX response
     logger.info(f"submit_assessment_new: Rendering HTMX for user {request.user.username}, assessment {assessment_id}")
     response = render(request, 'learner/partials/content.html', context)
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -2559,13 +2606,26 @@ def render_content(request, assessment, course):
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
 
+@login_required
 def learner_detail(request, username):
+    """
+    Detail learner: menampilkan daftar course, progress, dan ringkasan score.
+    Mendukung semua tipe assessment: MCQ (via AssessmentResult), In-Video Quiz, LTI, Askora/Essay.
+    """
+    user = request.user
+
+    # 🛑 Akses hanya untuk user sendiri
+    if username != user.username:
+        return HttpResponseForbidden("Access denied.")
+    if not getattr(user, 'is_learner', False):
+        return HttpResponseForbidden("Access denied: learner only.")
+
     learner = get_object_or_404(CustomUser, username=username)
 
     # Ambil semua enrollment dan course-nya sekaligus
     enrollments = Enrollment.objects.filter(user=learner).select_related('course').prefetch_related(
         'course__sections__materials',
-        'course__sections__assessments__questions'
+        'course__sections__assessments'
     )
 
     instructor = Instructor.objects.filter(user=learner).first()
@@ -2573,6 +2633,67 @@ def learner_detail(request, username):
     all_courses_data = []
     completed_courses_data = []
 
+    # Helper function untuk hitung score tiap assessment
+    def calculate_assessment_score(user, assessment):
+        """
+        Hitung score per assessment, mendukung:
+        - LTIResult
+        - In-Video Quiz (QuizResult)
+        - MCQ (AssessmentResult)
+        - Askora / ORA / Essay (Submission + AssessmentScore)
+        """
+        score_value = Decimal('0')
+        is_submitted = True
+
+        # CASE 1: LTIResult
+        lti_result = LTIResult.objects.filter(user=user, assessment=assessment).first()
+        if lti_result and lti_result.score is not None:
+            lti_score = Decimal(lti_result.score)
+            # Jika score > 1, diasumsikan 0-100, ubah ke 0-1
+            if lti_score > 1.0:
+                lti_score = lti_score / 100
+            score_value = lti_score * Decimal(assessment.weight)
+
+        # CASE 2: In-Video Quiz
+        elif QuizResult.objects.filter(user=user, assessment=assessment).exists():
+            quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).order_by('-created_at').first()
+            if quiz_result and quiz_result.total_questions > 0:
+                raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+                score_value = raw_percentage * Decimal(assessment.weight)
+            else:
+                is_submitted = False
+
+        # CASE 3: MCQ via AssessmentResult
+        elif AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
+            mcq_result = AssessmentResult.objects.filter(user=user, assessment=assessment).order_by('-submitted_at').first()
+            if mcq_result:
+                if mcq_result.total_questions > 0:
+                    # Bisa gunakan correct_answers / total_questions
+                    raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
+                    score_value = raw_percentage * Decimal(assessment.weight)
+                else:
+                    # fallback: jika score field sudah ada persentase
+                    score_value = (Decimal(mcq_result.score) / 100) * Decimal(assessment.weight)
+            else:
+                is_submitted = False
+
+        # CASE 4: Askora / ORA / Essay
+        else:
+            submission = Submission.objects.filter(askora__assessment=assessment, user=user).order_by('-submitted_at').first()
+            if submission:
+                assessment_score = AssessmentScore.objects.filter(submission=submission).first()
+                if assessment_score and assessment_score.final_score is not None:
+                    score_value = (Decimal(assessment_score.final_score) / Decimal(100)) * Decimal(assessment.weight)
+                else:
+                    is_submitted = False
+            else:
+                is_submitted = False
+
+        # Clamp score agar tidak melebihi weight
+        score_value = min(score_value, Decimal(assessment.weight))
+        return score_value, is_submitted
+
+    # Loop tiap enrollment/course
     for enrollment in enrollments:
         course = enrollment.course
 
@@ -2587,10 +2708,32 @@ def learner_detail(request, username):
         materials_read = MaterialRead.objects.filter(user=learner, material__in=materials).count()
         materials_progress = (materials_read / total_materials * 100) if total_materials > 0 else 0
 
-        # Progress assessment
-        assessments_read = AssessmentRead.objects.filter(user=learner, assessment__in=assessments).count()
-        assessments_progress = (assessments_read / total_assessments * 100) if total_assessments > 0 else 0
+        # Progress assessment & skor
+        assessment_scores = []
+        total_score = Decimal('0')
+        total_max_score = Decimal('0')
+        all_assessments_submitted = True
+        assessments_attempted = []
 
+        for assessment in assessments:
+            score, is_submitted = calculate_assessment_score(learner, assessment)
+            assessment_scores.append({
+                'assessment': assessment,
+                'score': score,
+                'weight': assessment.weight,
+                'is_submitted': is_submitted
+            })
+            total_score += score
+            total_max_score += assessment.weight
+            if is_submitted:
+                assessments_attempted.append(assessment.id)
+            else:
+                all_assessments_submitted = False
+
+        # Persentase assessment
+        assessments_progress = (len(assessments_attempted) / total_assessments * 100) if total_assessments > 0 else 0
+
+        # Rata-rata progress keseluruhan
         progress = (materials_progress + assessments_progress) / 2 if (total_materials + total_assessments) > 0 else 0
 
         # Simpan ke CourseProgress
@@ -2598,69 +2741,26 @@ def learner_detail(request, username):
         course_progress.progress_percentage = progress
         course_progress.save()
 
-        # Ambang batas kelulusan
-        grade_range = GradeRange.objects.filter(course=course, name='Pass').first()
-        passing_threshold = grade_range.min_grade if grade_range else Decimal('52.00')
+        # Ambang kelulusan
+        grade_range_pass = GradeRange.objects.filter(course=course, name='Pass').first()
+        passing_threshold = grade_range_pass.min_grade if grade_range_pass else Decimal('52.00')
 
-        # Hitung skor akhir
-        total_score = Decimal('0')
-        total_max_score = Decimal('0')
+        # Hitung overall percentage
+        overall_percentage = (total_score / total_max_score * 100) if total_max_score > 0 else Decimal('0')
 
-        for assessment in assessments:
-            score_value = Decimal('0')
+        # Tentukan status Pass/Fail
+        passing_criteria_met = overall_percentage >= passing_threshold and progress == 100
+        status = "Pass" if all_assessments_submitted and passing_criteria_met else "Fail"
 
-            # ====================================
-            # 1. Tipe Pilihan Ganda (question–choice)
-            # ====================================
-            total_questions_mcq = assessment.questions.count()
+        # Tentukan grade letter
+        grade_letter = GradeRange.objects.filter(
+            course=course,
+            min_grade__lte=overall_percentage,
+            max_grade__gte=overall_percentage
+        ).first()
+        grade_letter = grade_letter.name if grade_letter else "N/A"
 
-            if total_questions_mcq > 0:
-                correct = QuestionAnswer.objects.filter(
-                    user=learner, 
-                    question__assessment=assessment, 
-                    choice__is_correct=True
-                ).count()
-
-                score_value = (Decimal(correct) / Decimal(total_questions_mcq)) * assessment.weight
-
-            else:
-                # ====================================
-                # 2. Tipe Video InQuiz (QuizResult)
-                # ====================================
-                quiz_results = QuizResult.objects.filter(user=learner, assessment=assessment)
-
-                if quiz_results.exists():
-                    latest_result = quiz_results.order_by('-created_at').first()
-
-                    if latest_result.total_questions > 0:
-                        score_percentage = Decimal(latest_result.score) / Decimal(latest_result.total_questions) * 100
-                        score_value = (score_percentage / Decimal(100)) * assessment.weight
-
-                else:
-                    # ====================================
-                    # 3. Tipe ORA / LTI / Essay (Submission)
-                    # ====================================
-                    submission = Submission.objects.filter(
-                        askora__assessment=assessment, 
-                        user=learner
-                    ).order_by('-submitted_at').first()
-
-                    if submission:
-                        assessment_score = AssessmentScore.objects.filter(submission=submission).first()
-                        if assessment_score and assessment_score.final_score is not None:
-                            # Sudah berbentuk nilai final 0–100
-                            score_value = (Decimal(assessment_score.final_score) / Decimal(100)) * assessment.weight
-
-            # ====================================
-            # Tambahkan ke total
-            # ====================================
-            total_score += min(score_value, assessment.weight)
-            total_max_score += assessment.weight
-
-
-        overall_percentage = (total_score / total_max_score * 100) if total_max_score > 0 else 0
-        is_completed = progress == 100 and overall_percentage >= passing_threshold
-
+        # Simpan data course
         course_data = {
             'enrollment': enrollment,
             'course': course,
@@ -2668,19 +2768,23 @@ def learner_detail(request, username):
             'overall_percentage': round(overall_percentage, 2),
             'threshold': passing_threshold,
             'total_score': round(total_score, 2),
-            'is_completed': is_completed,
+            'is_completed': status == "Pass",
+            'assessments_attempted': assessments_attempted,
+            'assessment_scores': assessment_scores,
+            'status': status,
+            'grade': grade_letter
         }
 
         all_courses_data.append(course_data)
-
-        if is_completed:
+        if status == "Pass":
             completed_courses_data.append(course_data)
 
+    # Context untuk template
     context = {
         'learner': learner,
         'instructor': instructor,
         'all_courses': all_courses_data,
-        'completed_courses': completed_courses_data,
+        'completed_courses': completed_courses_data
     }
 
     return render(request, 'learner/learner.html', context)

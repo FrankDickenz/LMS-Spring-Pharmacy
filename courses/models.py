@@ -1153,6 +1153,24 @@ class Choice(models.Model):
     def __str__(self):
         return self.text
     
+class AssessmentResult(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE)
+    session = models.OneToOneField('AssessmentSession', on_delete=models.CASCADE)
+
+    total_questions = models.IntegerField(default=0)
+    correct_answers = models.IntegerField(default=0)
+    score = models.FloatField(default=0)  # bisa isi percentage
+
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'assessment', 'session')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.assessment} ({self.score}%)"
+
+    
 class AskOra(models.Model):
     assessment = models.ForeignKey(Assessment, related_name='ask_oras', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, null=True, blank=True)

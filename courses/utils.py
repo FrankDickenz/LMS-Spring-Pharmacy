@@ -11,6 +11,8 @@ import urllib.parse
 import hashlib
 import hmac
 import base64
+import csv
+from django.http import HttpResponse
 
 def generate_nonce(request):
     nonce = uuid.uuid4().hex
@@ -215,3 +217,58 @@ def generate_oauth_signature(params, consumer_secret, launch_url, http_method="P
     signature = base64.b64encode(hashed.digest()).decode()
 
     return signature
+
+
+
+# courses/utils.py
+
+
+def download_enrollment_data(course, enrollment_details):
+    """
+    Export enrollment data ke CSV.
+    """
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{course.course_name}_enrollments.csv"'},
+    )
+    writer = csv.writer(response)
+
+    # Header
+    headers = [
+        'Email', 'First Name', 'Last Name', 'Gender', 'Birth', 'Address',
+        'Country', 'Phone', 'Education', 'University', 'Progress', 'Status',
+        'Total Score', 'Max Score', 'Overall Percentage', 'Certificate Issued'
+    ]
+    # Tambahkan kolom per-assessment
+    if enrollment_details:
+        for result in enrollment_details[0]['assessment_results']:
+            headers.append(f"{result['assessment']}_Score")
+            headers.append(f"{result['assessment']}_Max")
+
+    writer.writerow(headers)
+
+    for detail in enrollment_details:
+        row = [
+            detail['email'],
+            detail['first_name'],
+            detail['last_name'],
+            detail.get('gender', 'N/A'),
+            detail.get('birth', 'N/A'),
+            detail.get('address', 'N/A'),
+            detail.get('country', 'N/A'),
+            detail.get('phone', 'N/A'),
+            detail.get('education', 'N/A'),
+            detail.get('university', 'N/A'),
+            detail['progress_percentage'],
+            detail['status'],
+            detail['total_score'],
+            detail['total_max_score'],
+            detail['overall_percentage'],
+            detail['certificate_issued'],
+        ]
+        for result in detail['assessment_results']:
+            row.append(result['score'])
+            row.append(result['weight'])
+        writer.writerow(row)
+
+    return response

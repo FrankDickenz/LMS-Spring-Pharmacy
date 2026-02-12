@@ -1,6 +1,6 @@
 from django.contrib import admin
 from . import models 
-from .models import  SectionReport,Option,Video,Quiz, QuizResult,CourseTeam,UserActivityLog,CourseSessionLog,InstructorCertificate,LTIResult,LastAccessCourse,LTIExternalTool1,MicroClaim,UserMicroProgress,MicroCredentialComment,Certificate,Submission,CourseRating,UserProfile,Hashtag,SosPost,AskOra,BlacklistedKeyword, PeerReview,MicroCredential, AssessmentScore,Partner,Comment,CourseComment,AssessmentRead,Choice,AssessmentSession,QuestionAnswer,CourseStatusHistory,CourseStatus,CourseProgress,MaterialRead,CalculateAdminPrice,Universiti,GradeRange,Enrollment,PricingType,CoursePrice, Instructor, Category, Course, TeamMember, Section, Material,Question, Choice, Score, AttemptedQuestion,Assessment
+from .models import  AssessmentResult,SectionReport,Option,Video,Quiz, QuizResult,CourseTeam,UserActivityLog,CourseSessionLog,InstructorCertificate,LTIResult,LastAccessCourse,LTIExternalTool1,MicroClaim,UserMicroProgress,MicroCredentialComment,Certificate,Submission,CourseRating,UserProfile,Hashtag,SosPost,AskOra,BlacklistedKeyword, PeerReview,MicroCredential, AssessmentScore,Partner,Comment,CourseComment,AssessmentRead,Choice,AssessmentSession,QuestionAnswer,CourseStatusHistory,CourseStatus,CourseProgress,MaterialRead,CalculateAdminPrice,Universiti,GradeRange,Enrollment,PricingType,CoursePrice, Instructor, Category, Course, TeamMember, Section, Material,Question, Choice, Score, AttemptedQuestion,Assessment
 from import_export.admin import ImportExportModelAdmin
 from django.utils.html import format_html
 from django.utils.text import slugify
@@ -492,3 +492,37 @@ class CertificateAdmin(admin.ModelAdmin):
     
     # Optional: Add pagination to the list view
     list_per_page = 25
+
+
+@admin.register(AssessmentResult)
+class AssessmentResultAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'assessment',
+        'total_questions',
+        'correct_answers',
+        'score',
+        'submitted_at',
+    )
+
+    list_filter = (
+        'assessment',
+        'submitted_at',
+    )
+
+    search_fields = (
+        'user__username',
+        'assessment__title',
+    )
+
+    # Hanya field tertentu yang readonly
+    readonly_fields = (
+        'user',
+        'assessment',
+        'session',
+        'submitted_at',
+    )
+
+    # Field yang bisa diedit: total_questions, correct_answers, score
+    # Jangan dicantumkan di readonly_fields
+    ordering = ('-submitted_at',)
