@@ -2314,136 +2314,28 @@ def calculate_course_progress(user, course):
 
 @login_required
 def submit_answer_askora_new(request, ask_ora_id):
-    """
-    Submit an answer for an AskOra question, rendering content partial.
-    
-    Args:
-        request: HTTP request object.
-        ask_ora_id: ID of the AskOra question.
-    
-    Returns:
-        HttpResponse: Rendered assessment partial.
-    """
+
     if request.method != 'POST':
-        logger.warning(f"Invalid request method: {request.method} for submit_answer_askora_new")
-        return render(request, 'learner/partials/error.html', {
-            'error_message': 'Metode request tidak valid.'
-        }, status=400) if request.headers.get('HX-Request') == 'true' else HttpResponse(status=400)
+        return HttpResponse(status=400)
 
     ask_ora = get_object_or_404(AskOra, id=ask_ora_id)
     assessment = ask_ora.assessment
-    course = assessment.section.courses  # Assuming this is correct from previous fix
-
-    if not ask_ora.is_responsive():
-        logger.warning(f"Submission deadline expired for ask_ora {ask_ora_id}")
-        messages.warning(request, "Batas waktu pengiriman telah berakhir.")
-        return render(request, 'learner/partials/error.html', {
-            'error_message': 'Batas waktu pengiriman telah berakhir.'
-        }, status=400) if request.headers.get('HX-Request') == 'true' else HttpResponse(status=400)
+    course = assessment.section.courses
 
     if Submission.objects.filter(askora=ask_ora, user=request.user).exists():
-        logger.warning(f"Duplicate submission attempt for ask_ora {ask_ora_id} by {request.user.username}")
-        messages.warning(request, "Anda sudah mengirimkan jawaban untuk pertanyaan ini.")
-        return render(request, 'learner/partials/error.html', {
-            'error_message': 'Anda sudah mengirimkan jawaban untuk pertanyaan ini.'
-        }, status=400) if request.headers.get('HX-Request') == 'true' else HttpResponse(status=400)
+        messages.warning(request, "Anda sudah mengirimkan jawaban.")
+        return render_content(request, assessment, course)
 
-    answer_text = request.POST.get('answer_text')
-    answer_file = request.FILES.get('answer_file')
-    if not answer_text:
-        logger.warning(f"Missing answer_text for ask_ora {ask_ora_id} by {request.user.username}")
-        messages.warning(request, "Jawaban teks diperlukan.")
-        return render(request, 'learner/partials/error.html', {
-            'error_message': 'Jawaban teks diperlukan.'
-        }, status=400) if request.headers.get('HX-Request') == 'true' else HttpResponse(status=400)
-
-    # Buat submission
-    submission = Submission.objects.create(
+    Submission.objects.create(
         askora=ask_ora,
         user=request.user,
-        answer_text=answer_text,
-        answer_file=answer_file
+        answer_text=request.POST.get('answer_text'),
+        answer_file=request.FILES.get('answer_file')
     )
-    logger.debug(f"Submission created for ask_ora {ask_ora_id} by {request.user.username}")
 
-    # Bangun konteks untuk template
-    context = {
-        'course': course,
-        'course_name': course.course_name,  # Sesuaikan dengan atribut model Course
-        'username': request.user.username,
-        'slug': course.slug,
-        'sections': Section.objects.filter(courses=course).prefetch_related('materials', 'assessments').order_by('order'),
-        'current_content': ('assessment', assessment, assessment.section),
-        'material': None,
-        'assessment': assessment,
-        'comments': None,
-        'assessment_locked': False,  # Sesuaikan dengan logika Anda
-        'payment_required_url': None,
-        'is_started': True,  # Sesuaikan dengan logika sesi
-        'is_expired': False,  # Sesuaikan dengan logika sesi
-        'remaining_time': 0,  # Sesuaikan jika ada timer
-        'ask_oras': assessment.ask_oras.all(),  # Fixed: Use ask_oras instead of askora_set
-        'user_submissions': Submission.objects.filter(askora__assessment=assessment, user=request.user),
-        'can_review': Submission.objects.filter(askora__assessment=assessment).exclude(user=request.user).exists(),
-        'submissions': Submission.objects.filter(askora__assessment=assessment).exclude(user=request.user),
-        'is_quiz': False,
-        'askora_can_submit': {
-            ao.id: ao.is_responsive() and not Submission.objects.filter(askora=ao, user=request.user).exists()
-            for ao in assessment.ask_oras.all()  # Fixed: Consistent use of ask_oras
-        },
-        'course_progress': CourseProgress.objects.get_or_create(user=request.user, course=course)[0].progress_percentage,
-        'previous_url': None,
-        'next_url': None,
-    }
-
-    # Tambahkan konteks tambahan untuk peer review stats
-    context.update({
-        'peer_review_stats': {
-            'distinct_reviewers': 0,  # Ganti dengan logika sebenarnya
-            'total_participants': 0,  # Ganti dengan logika sebenarnya
-            'completed': False,  # Ganti dengan logika sebenarnya
-            'avg_score': None,  # Ganti dengan logika sebenarnya
-        },
-        'course_scores': [],  # Sesuaikan jika ada skor kuis
-    })
-
-    # Hitung URL navigasi
-    combined_content = []
-    for section in context['sections']:
-        for material in section.materials.all():
-            combined_content.append(('material', material))
-        for assessment in section.assessments.all():
-            combined_content.append(('assessment', assessment))
-    current_index = next((i for i, c in enumerate(combined_content) if c[0] == 'assessment' and c[1].id == assessment.id), 0)
-    if current_index > 0:
-        prev = combined_content[current_index - 1]
-        context['previous_url'] = reverse('learner:load_content', kwargs={
-            'username': request.user.username,
-            'id':course.id,
-            'slug': course.slug,
-            'content_type': prev[0],
-            'content_id': prev[1].id
-        })
-    if current_index < len(combined_content) - 1:
-        next_item = combined_content[current_index + 1]
-        context['next_url'] = reverse('learner:load_content', kwargs={
-            'username': request.user.username,
-            'id': course.id,
-            'slug': course.slug,
-            'content_type': next_item[0],
-            'content_id': next_item[1].id
-        })
-
-    # Tambahkan pesan sukses
     messages.success(request, "Jawaban berhasil dikirim!")
-    
-    # Render template parsial
-    is_htmx = request.headers.get('HX-Request') == 'true'
-    logger.info(f"submit_answer_askora_new: Rendering HTMX for user {request.user.username}, assessment {assessment.id}, ask_ora {ask_ora_id}")
-    response = render(request, 'learner/partials/content.html', context)
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    return response
 
+    return render_content(request, assessment, course)
 
 
 @login_required
