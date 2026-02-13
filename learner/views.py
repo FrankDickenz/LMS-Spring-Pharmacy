@@ -1084,7 +1084,12 @@ def _build_assessment_context(assessment, user):
     Termasuk dukungan untuk AskOra, kuis, peer review, dan LTI 1.1.
     """
 
-    # Periksa apakah assessment memiliki alat LTI 1.1 terkait
+    from django.utils import timezone
+    from django.db.models import Count, Avg
+
+    # =============================
+    # LTI CHECK
+    # =============================
     lti_tool = getattr(assessment, 'lti_tool', None)
 
     if lti_tool:
@@ -1098,20 +1103,32 @@ def _build_assessment_context(assessment, user):
             'has_other_submissions': False,
             'is_quiz': False,
             'peer_review_stats': None,
+            'score_released': False,
             'is_lti': True,
-            'lti_tool': lti_tool,  # digunakan untuk generate launch form/link
+            'lti_tool': lti_tool,
         }
 
-    # --- Lanjutan untuk assessment non-LTI (AskOra atau Quiz) ---
+    # =============================
+    # NON-LTI (AskOra / Quiz)
+    # =============================
     ask_oras = AskOra.objects.filter(assessment=assessment)
-    user_submissions = Submission.objects.filter(askora__assessment=assessment, user=user)
-    submitted_askora_ids = set(user_submissions.values_list('askora_id', flat=True))
+    user_submissions = Submission.objects.filter(
+        askora__assessment=assessment,
+        user=user
+    )
+
+    submitted_askora_ids = set(
+        user_submissions.values_list('askora_id', flat=True)
+    )
+
     now = timezone.now()
 
     submissions = Submission.objects.filter(
         askora__assessment=assessment
     ).exclude(user=user).exclude(
-        id__in=PeerReview.objects.filter(reviewer=user).values('submission__id')
+        id__in=PeerReview.objects.filter(
+            reviewer=user
+        ).values('submission__id')
     )
 
     has_other_submissions = Submission.objects.filter(
@@ -1122,46 +1139,105 @@ def _build_assessment_context(assessment, user):
         'ask_oras': ask_oras,
         'user_submissions': user_submissions,
         'askora_submit_status': {
-            askora.id: (askora.id in submitted_askora_ids) for askora in ask_oras
+            askora.id: (askora.id in submitted_askora_ids)
+            for askora in ask_oras
         },
         'askora_can_submit': {
             askora.id: (
                 askora.id not in submitted_askora_ids and
                 askora.is_responsive and
                 (askora.response_deadline is None or askora.response_deadline > now)
-            ) for askora in ask_oras
+            )
+            for askora in ask_oras
         },
         'can_review': submissions.exists(),
         'submissions': submissions,
         'has_other_submissions': has_other_submissions,
         'is_quiz': assessment.questions.exists(),
         'peer_review_stats': None,
+        'score_released': False,  # default aman
         'is_lti': False,
     }
 
+    # =============================
+    # PEER REVIEW STATS
+    # =============================
     if user_submissions.exists():
+
         total_participants = Submission.objects.filter(
             askora__assessment=assessment
         ).values('user').distinct().count()
+
         user_reviews = PeerReview.objects.filter(
             submission__in=user_submissions
         ).aggregate(
             total_reviews=Count('id'),
             distinct_reviewers=Count('reviewer', distinct=True)
         )
+
+        distinct_reviewers = user_reviews['distinct_reviewers'] or 0
+        total_reviews = user_reviews['total_reviews'] or 0
+
         context['peer_review_stats'] = {
-            'total_reviews': user_reviews['total_reviews'] or 0,
-            'distinct_reviewers': user_reviews['distinct_reviewers'] or 0,
-            'total_participants': total_participants - 1,
-            'completed': user_reviews['distinct_reviewers'] >= (total_participants - 1)
+            'total_reviews': total_reviews,
+            'distinct_reviewers': distinct_reviewers,
+            'total_participants': max(total_participants - 1, 0),
+            'completed': distinct_reviewers >= max(total_participants - 1, 0)
         }
-        if user_reviews['total_reviews'] > 0:
+
+        # =============================
+        # HITUNG RATA-RATA NILAI
+        # =============================
+        if total_reviews > 0:
             avg_score = PeerReview.objects.filter(
                 submission__in=user_submissions
             ).aggregate(avg_score=Avg('score'))['avg_score']
-            context['peer_review_stats']['avg_score'] = round(avg_score, 2) if avg_score else None
+
+            context['peer_review_stats']['avg_score'] = (
+                round(avg_score, 2) if avg_score else None
+            )
+
+        # =============================
+        # LOCK SCORE LOGIC
+        # =============================
+
+        # Total submission yang harus direview user
+        total_to_review = Submission.objects.filter(
+            askora__assessment=assessment
+        ).exclude(user=user).count()
+
+        # Berapa yang sudah direview user
+        user_review_count = PeerReview.objects.filter(
+            reviewer=user,
+            submission__askora__assessment=assessment
+        ).count()
+
+        has_completed_review = (
+            total_to_review > 0 and
+            user_review_count >= total_to_review
+        )
+
+        # Tentukan minimal review yang harus diterima
+        participants_minus_self = max(total_participants - 1, 0)
+
+        if participants_minus_self <= 1:
+            min_required_reviews = 0
+        elif participants_minus_self == 1:
+            min_required_reviews = 1
+        elif participants_minus_self == 2:
+            min_required_reviews = 2
+        else:
+            min_required_reviews = 3
+
+        score_released = (
+            has_completed_review and
+            distinct_reviewers >= min_required_reviews
+        )
+
+        context['score_released'] = score_released
 
     return context
+
 
 
 @login_required

@@ -463,11 +463,25 @@
                                         <p class="text-lg font-semibold text-gray-700 mt-2">Answers You Need to Review</p>
                                     </div>
                                     <div class="bg-white rounded-xl p-6 text-center shadow">
-                                        <p class="text-5xl font-black {% if peer_review_stats.avg_score >= 4 %}text-green-600{% else %}text-orange-600{% endif %}">
-                                            {{ peer_review_stats.avg_score|default:"-" }}/5
+
+                                        {% if score_released %}
+                                            <p class="text-5xl font-black {% if peer_review_stats.avg_score >= 4 %}text-green-600{% else %}text-orange-600{% endif %}">
+                                                {{ peer_review_stats.avg_score|default:"-" }}/5
+                                            </p>
+                                        {% else %}
+                                            <p class="text-5xl font-black text-gray-400">
+                                                🔒
+                                            </p>
+                                            <p class="text-sm text-gray-500 mt-2">
+                                                Complete all required peer reviews to unlock your score
+                                            </p>
+                                        {% endif %}
+
+                                        <p class="text-lg font-semibold text-gray-700 mt-2">
+                                            Average Score from Peers
                                         </p>
-                                        <p class="text-lg font-semibold text-gray-700 mt-2">Average Score from Peers</p>
                                     </div>
+
                                 </div>
 
                                 {# Jika masih ada yang harus direview #}
