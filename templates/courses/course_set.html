@@ -70,24 +70,17 @@
 
       <!-- RIGHT: Action Buttons -->
       <div class="flex items-center gap-2 flex-shrink-0">
-        <button
+        <a href="{% url 'courses:self_course' user.username course.id course.slug %}"
           class="px-3 py-1.5 text-xs sm:text-sm font-medium text-gray-700
-                 border border-gray-300 rounded
-                 hover:bg-gray-50 transition
-                 flex items-center gap-1.5"
-        >
+                  border border-gray-300 rounded
+                  hover:bg-gray-50 transition
+                  flex items-center gap-1.5">
           <i class="fa-solid fa-eye text-xs"></i>
           <span>View Live</span>
-        </button>
+        </a>
 
-        <button
-          class="px-3 py-1.5 text-xs sm:text-sm font-medium text-white
-                 bg-blue-600 rounded hover:bg-blue-700 transition
-                 flex items-center gap-1.5"
-        >
-          <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-          <span>Publish</span>
-        </button>
+
+        
 
         <!-- Mobile Menu Button -->
         <button class="p-2 text-gray-600 hover:bg-gray-100 rounded md:hidden">
