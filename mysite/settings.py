@@ -337,11 +337,19 @@ CKEDITOR_5_CONFIGS = {
             "bold",
             "italic",
             "link",
+            "|",
             "bulletedList",
             "numberedList",
             "blockQuote",
+            "|",
             "insertImage",
+            "|",
+            "alignment",
         ],
+        # ✅ Tambahkan konfigurasi alignment
+        "alignment": {
+            "options": ["left", "center", "right", "justify"]
+        },
         "link": {
             "defaultProtocol": "https://",  # Menggunakan https:// sebagai default
             "allowedProtocols": ["https"],  # Hanya mengizinkan http:// dan https://
@@ -371,174 +379,197 @@ CKEDITOR_5_CONFIGS = {
         ],
     },
     "extends": {
-        "language": "en",
-        "blockToolbar": [
-            "paragraph",
-            "heading1",
-            "heading2",
-            "heading3",
+    "language": "en",
+
+    # =========================
+    # TOOLBAR UTAMA
+    # =========================
+    "toolbar": {
+        "items": [
+            "heading",
+            "|",
+            "alignment",
+            "|",
+            "horizontalLine",
+            "codeBlock",
+            "htmlEmbed",
+            "|",
+            "outdent",
+            "indent",
+            "|",
+            "bold",
+            "italic",
+            "underline",
+            "strikethrough",
+            "code",
+            "subscript",
+            "superscript",
+            "highlight",
             "|",
             "bulletedList",
             "numberedList",
+            "todoList",
             "|",
             "blockQuote",
+            "link",
+            "linkImage",
+            "insertImage",
+            "|",
+            "fontSize",
+            "fontFamily",
+            "fontColor",
+            "fontBackgroundColor",
+            "|",
+            "mediaEmbed",
+            "insertTable",
+            "specialCharacters",
+            "|",
+            "removeFormat",
+            "showBlocks",
+            "findAndReplace",
+            "selectAll",
+            "|",
+            "sourceEditing",
         ],
-        "toolbar": {
-            "items": [
-                "heading",
-                "horizontalLine",
-                "codeBlock",
-                "htmlEmbed",
-                "|",
-                "outdent",
-                "indent",
-                "|",
-                "bold",
-                "italic",
-                "link",
-                "underline",
-                "strikethrough",
-                "code",
-                "subscript",
-                "superscript",
-                "highlight",
-                "|",
-                "bulletedList",
-                "numberedList",
-                "todoList",
-                "|",
-                "blockQuote",
-                "linkImage",
-                "insertImage",
-                "|",
-                "fontSize",
-                "fontFamily",
-                "fontColor",
-                "fontBackgroundColor",
-                "mediaEmbed",
-                "removeFormat",
-                "insertTable",
-                "sourceEditing",
-                "style",
-                "specialCharacters",
-                "fileUpload",
-                "showBlocks",
-                "selectAll",
-                "findAndReplace",
-            ],
-            "shouldNotGroupWhenFull": True,
-        },
-        "image": {
-            "toolbar": [
-                "imageTextAlternative",
-                "|",
-                "imageStyle:alignLeft",
-                "imageStyle:alignRight",
-                "imageStyle:alignCenter",
-                "imageStyle:side",
-                "|",
-            ],
-            "styles": [
-                "full",
-                "side",
-                "alignLeft",
-                "alignRight",
-                "alignCenter",
-            ],
-        },
-        "table": {
-            "contentToolbar": [
-                "tableColumn",
-                "tableRow",
-                "mergeTableCells",
-                "tableProperties",
-                "tableCellProperties",
-                "toggleTableCaption",
-            ],
-            "tableProperties": {
-                "borderColors": customColorPalette,
-                "backgroundColors": customColorPalette,
-            },
-            "tableCellProperties": {
-                "borderColors": customColorPalette,
-                "backgroundColors": customColorPalette,
-            },
-        },
-        "heading": {
-            "options": [
-                {
-                    "model": "paragraph",
-                    "title": "Paragraph",
-                    "class": "ck-heading_paragraph",
-                },
-                {
-                    "model": "heading1",
-                    "view": "h1",
-                    "title": "Heading 1",
-                    "class": "ck-heading_heading1",
-                },
-                {
-                    "model": "heading2",
-                    "view": "h2",
-                    "title": "Heading 2",
-                    "class": "ck-heading_heading2",
-                },
-                {
-                    "model": "heading3",
-                    "view": "h3",
-                    "title": "Heading 3",
-                    "class": "ck-heading_heading3",
-                },
-            ],
-        },
-        "list": {
-            "properties": {
-                "styles": True,
-                "startIndex": True,
-                "reversed": True,
-            },
-        },
-         "link": {
-            "defaultProtocol": "https://",  # Menggunakan https:// sebagai default
-            "allowedProtocols": ["https"],  # Hanya mengizinkan http:// dan https://
-            "allowedDomains": [
-                "youtube.com",
-                "facebook.com",
-                "x.com",
-                
-                "tiktok.com"
-            ],
-            "checkCurrentDocument": False,  # Tidak memeriksa URL dokumen saat ini
-        },
-        "htmlSupport": {
-            "allow": [
-                {"name": "/.*/", "attributes": True, "classes": True, "styles": True},
-            ],
-        },
-        "mention": {
-            "feeds": [
-                {
-                    "marker": "@",
-                    "feed": [
-                        "@Barney",
-                        "@Lily",
-                        "@Marry Ann",
-                        "@Marshall",
-                        "@Robin",
-                        "@Ted",
-                    ],
-                    "minimumCharacters": 1,
-                },
-            ],
-        },
-        "style": {
-            "definitions": [
-                {"name": "Article category", "element": "h3", "classes": ["category"]},
-                {"name": "Info box", "element": "p", "classes": ["info-box"]},
-            ],
+        "shouldNotGroupWhenFull": True,
+    },
+
+    # =========================
+    # ALIGNMENT (HARUS DI LUAR TOOLBAR)
+    # =========================
+    "alignment": {
+        "options": ["left", "center", "right", "justify"]
+    },
+
+    # =========================
+    # BLOCK TOOLBAR (SIDEBAR +)
+    # =========================
+    "blockToolbar": [
+        "paragraph",
+        "heading1",
+        "heading2",
+        "heading3",
+        "|",
+        "bulletedList",
+        "numberedList",
+        "blockQuote",
+    ],
+
+    # =========================
+    # IMAGE CONFIG
+    # =========================
+    "image": {
+        "toolbar": [
+            "imageTextAlternative",
+            "|",
+            "imageStyle:alignLeft",
+            "imageStyle:alignCenter",
+            "imageStyle:alignRight",
+            "imageStyle:side",
+        ],
+        "styles": [
+            "full",
+            "side",
+            "alignLeft",
+            "alignCenter",
+            "alignRight",
+        ],
+    },
+
+    # =========================
+    # TABLE CONFIG
+    # =========================
+    "table": {
+        "contentToolbar": [
+            "tableColumn",
+            "tableRow",
+            "mergeTableCells",
+            "tableProperties",
+            "tableCellProperties",
+            "toggleTableCaption",
+        ],
+    },
+
+    # =========================
+    # HEADING CONFIG
+    # =========================
+    "heading": {
+        "options": [
+            {"model": "paragraph", "title": "Paragraph", "class": "ck-heading_paragraph"},
+            {"model": "heading1", "view": "h1", "title": "Heading 1", "class": "ck-heading_heading1"},
+            {"model": "heading2", "view": "h2", "title": "Heading 2", "class": "ck-heading_heading2"},
+            {"model": "heading3", "view": "h3", "title": "Heading 3", "class": "ck-heading_heading3"},
+        ],
+    },
+
+    # =========================
+    # LIST CONFIG
+    # =========================
+    "list": {
+        "properties": {
+            "styles": True,
+            "startIndex": True,
+            "reversed": True,
         },
     },
+
+    # =========================
+    # LINK CONFIG
+    # =========================
+    "link": {
+        "defaultProtocol": "https://",
+        "allowedProtocols": ["https"],
+        "allowedDomains": [
+            "youtube.com",
+            "facebook.com",
+            "x.com",
+            "tiktok.com"
+        ],
+        "checkCurrentDocument": False,
+    },
+
+    # =========================
+    # HTML SUPPORT (FULL CONTROL)
+    # =========================
+    "htmlSupport": {
+        "allow": [
+            {"name": "/.*/", "attributes": True, "classes": True, "styles": True},
+        ],
+    },
+
+    # =========================
+    # MENTION
+    # =========================
+    "mention": {
+        "feeds": [
+            {
+                "marker": "@",
+                "feed": [
+                    "@Barney",
+                    "@Lily",
+                    "@Marry Ann",
+                    "@Marshall",
+                    "@Robin",
+                    "@Ted",
+                ],
+                "minimumCharacters": 1,
+            },
+        ],
+    },
+
+    # =========================
+    # STYLE DEFINITIONS
+    # =========================
+    "style": {
+        "definitions": [
+            {"name": "Article category", "element": "h3", "classes": ["category"]},
+            {"name": "Info box", "element": "p", "classes": ["info-box"]},
+        ],
+    },
+},
 }
+
+
 
 CKEDITOR_5_CUSTOM_CSS = "custom.css"
 #CSRF_COOKIE_NAME = "new_csrf_cookie_name"
