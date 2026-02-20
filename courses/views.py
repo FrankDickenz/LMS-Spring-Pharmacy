@@ -21,6 +21,7 @@ from urllib.parse import quote, urlparse, parse_qs, urlencode
 from django.template.loader import get_template
 from .utils import generate_oauth_signature  # pastikan ada util ini
 from datetime import date
+from django.db import transaction
 # Third-party packages
 import pytz
 import qrcode
@@ -7541,3 +7542,171 @@ def course_team_remove(request, course_id, member_id):
     messages.success(request, f"{member.user.username} has been removed from the team.")
     return redirect('courses:course_team', course_id=course.id)
 
+
+def build_grade_table(course):
+    """Bangun table_data untuk semua user + assessment + average + grade"""
+    table_data = []
+    enrolled_users = [e.user for e in course.enrollments.select_related('user')]
+    assessments = Assessment.objects.filter(section__in=course.sections.all()).order_by('id')
+    grade_ranges = course.grade_ranges.all()
+
+    for user in enrolled_users:
+        scores = {}
+        total_score = Decimal('0')
+        total_max = Decimal('0')
+
+        for assessment in assessments:
+            score = Decimal('0')
+            # gunakan weight sebagai max_score
+            max_score = getattr(assessment, 'weight', Decimal('100'))
+
+            # 1️⃣ QuizResult
+            quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+            if quiz_result:
+                score = Decimal(quiz_result.score)
+                max_score = Decimal(quiz_result.total_questions)
+
+            # 2️⃣ AssessmentResult (MCQ / Exam)
+            elif AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
+                ass_result = AssessmentResult.objects.filter(user=user, assessment=assessment).first()
+                score = Decimal(ass_result.score)
+                max_score = Decimal(assessment.weight)
+
+            # 3️⃣ LTIResult
+            elif LTIResult.objects.filter(user=user, assessment=assessment).exists():
+                lti_result = LTIResult.objects.get(user=user, assessment=assessment)
+                score = Decimal(lti_result.score) * Decimal('100')
+                max_score = Decimal(assessment.weight)
+
+            # 4️⃣ AssessmentScore (Essay / ORA)
+            elif AssessmentScore.objects.filter(
+                submission__user=user,
+                submission__askora__assessment=assessment
+            ).exists():
+                ass_score = AssessmentScore.objects.filter(
+                    submission__user=user,
+                    submission__askora__assessment=assessment
+                ).first()
+                score = Decimal(ass_score.final_score)
+                max_score = Decimal(assessment.weight)
+
+            # simpan score
+            scores[assessment.id] = score
+            total_score += score
+            total_max += max_score
+
+        # hitung average %
+        average = (total_score / total_max * Decimal('100')) if total_max > 0 else Decimal('0')
+
+        # tentukan grade
+        grade_name = '-'
+        for gr in grade_ranges:
+            if gr.min_grade <= average <= gr.max_grade:
+                grade_name = gr.name
+                break
+
+        table_data.append({
+            'user': user,
+            'scores': scores,
+            'total_score': round(total_score, 2),
+            'total_max': round(total_max, 2),
+            'average': round(average, 2),
+            'grade': grade_name
+        })
+
+    table_data.sort(key=lambda x: x['average'], reverse=True)
+    return table_data, assessments, grade_ranges
+
+
+def grade_distribution_update(request, course_id):
+    """View untuk override nilai manual + update table"""
+    course = get_object_or_404(Course, id=course_id)
+    table_data, assessments, grade_ranges = build_grade_table(course)
+
+    if request.method == 'POST':
+        for row in table_data:
+            user = row['user']
+            for assessment in assessments:
+                input_name = f"score_{user.id}_{assessment.id}"
+                input_value = request.POST.get(input_name)
+
+                if input_value:
+                    try:
+                        score_value = Decimal(input_value)
+                    except:
+                        continue  # skip jika input invalid
+
+                    updated = False
+
+                    # 1️⃣ Update QuizResult jika ada
+                    quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+                    if quiz_result:
+                        quiz_result.score = score_value
+                        quiz_result.save()
+                        updated = True
+                    # Jika belum ada QuizResult tapi ingin override → buat baru dengan video=None
+                    elif not quiz_result:
+                        try:
+                            QuizResult.objects.create(
+                                user=user,
+                                assessment=assessment,
+                                video=None,  # ⚠ harus diisi jika model memerlukan
+                                score=score_value,
+                                total_questions=getattr(assessment, 'weight', 100)
+                            )
+                            updated = True
+                        except:
+                            pass  # jika field NOT NULL, skip
+
+                    # 2️⃣ Update AssessmentResult (MCQ / Exam)
+                    if AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
+                        ass_result = AssessmentResult.objects.get(user=user, assessment=assessment)
+                        if ass_result.total_questions > 0:
+                            new_correct = int(round((score_value / Decimal(assessment.weight)) * ass_result.total_questions))
+                            ass_result.correct_answers = min(new_correct, ass_result.total_questions)
+                        ass_result.score = float(score_value)
+                        ass_result.save()
+                        updated = True
+                    else:
+                        # buat baru jika belum ada
+                        AssessmentResult.objects.create(
+                            user=user,
+                            assessment=assessment,
+                            session=None,
+                            total_questions=getattr(assessment, 'weight', 100),
+                            correct_answers=int(score_value),
+                            score=float(score_value)
+                        )
+                        updated = True
+
+                    # 3️⃣ Update LTIResult
+                    if not updated and LTIResult.objects.filter(user=user, assessment=assessment).exists():
+                        lti_result = LTIResult.objects.get(user=user, assessment=assessment)
+                        lti_result.score = (score_value / Decimal('100'))
+                        lti_result.save()
+                        updated = True
+
+                    # 4️⃣ Update AssessmentScore (Essay / ORA)
+                    if not updated and AssessmentScore.objects.filter(
+                        submission__user=user,
+                        submission__askora__assessment=assessment
+                    ).exists():
+                        ass_score = AssessmentScore.objects.filter(
+                            submission__user=user,
+                            submission__askora__assessment=assessment
+                        ).first()
+                        ass_score.final_score = score_value
+                        ass_score.save()
+                        updated = True
+
+        messages.success(request, "Nilai berhasil diperbarui!")
+        # reload table
+        table_data, assessments, grade_ranges = build_grade_table(course)
+
+    context = {
+        'course': course,
+        'assessments': assessments,
+        'table_data': table_data,
+        'grade_ranges': grade_ranges,
+    }
+    return render(request, 'learner/grade_distribution.html', context)

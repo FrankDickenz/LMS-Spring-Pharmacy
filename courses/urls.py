@@ -161,7 +161,8 @@ urlpatterns = [
         'course/<int:course_id>/reports/',
         views.section_reports_dashboard,
         name='section_reports_dashboard'
-    )
+    ),
+    path('grade-distribution/<int:course_id>/update/', views.grade_distribution_update, name='grade_distribution_update')
 
  
     

@@ -43,6 +43,12 @@
         class="px-4 py-2 bg-white border-2 border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center justify-center gap-1">
             View Score Summary Detail
         </a>
+
+        <a href="{% url 'learner:grade_distribution' course_id=course.id %}" 
+        class="px-4 py-2 bg-white border-2 border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition shadow-sm flex items-center justify-center gap-1">
+            View grade distribution
+        </a>
+
     </div>
 
 

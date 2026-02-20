@@ -25,8 +25,11 @@ urlpatterns = [
     path('video/<int:video_id>/save-result/<int:assessment_id>/',views.save_invideo_quiz,name='save_invideo_quiz'),
     path("my-activity/", views.my_activity, name="my_activity"),
     path('invite-learner/<int:course_id>/', views.invite_learner, name='invite_learner'),
-    path('<str:username>/<int:course_id>/section/<int:section_id>/report/',views.submit_report, name='submit_report')
+    path('<str:username>/<int:course_id>/section/<int:section_id>/report/',views.submit_report, name='submit_report'),
+    path('grade-distribution/<int:course_id>/', views.grade_distribution_view, name='grade_distribution')
     
+    
+
    
 
 

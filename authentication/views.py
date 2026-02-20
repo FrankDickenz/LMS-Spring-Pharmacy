@@ -1535,7 +1535,7 @@ def logout_view(request):
     return redirect('authentication:home')  # Redirect to home page after logout
 
 #login view
-@ratelimit(key='ip', rate='5/m', block=False)
+#@ratelimit(key='ip', rate='5/m', block=False)
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('authentication:home')

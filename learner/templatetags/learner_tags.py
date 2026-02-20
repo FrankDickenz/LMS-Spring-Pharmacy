@@ -269,3 +269,8 @@ def is_content_read(context, content_type, content_id):
 
     
     return False
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

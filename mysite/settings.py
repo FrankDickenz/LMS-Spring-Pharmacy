@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-*t=li&h7o=sj40!ic&)p+8!fy3p@*tfg+mz6!xuftigv_qa9yy
 
 #=============================== for development ===============================
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1','localhost']
+ALLOWED_HOSTS = ['127.0.0.1']
 #ALLOWED_REFERER = 'http://127.0.0.1:8000'
 #=============================== end development ===============================
 
