@@ -162,9 +162,11 @@ urlpatterns = [
         views.section_reports_dashboard,
         name='section_reports_dashboard'
     ),
-    path('grade-distribution/<int:course_id>/update/', views.grade_distribution_update, name='grade_distribution_update')
+    path('grade-distribution/<int:course_id>/update/', views.grade_distribution_update, name='grade_distribution_update'),
 
- 
+    path('course/<int:course_id>/download_grade_template/', views.download_grade_template, name='download_grade_template'),
+    # URL untuk memperbarui nilai secara massal
+    path('course/<int:course_id>/update_grades/', views.update_grades, name='upload_grades')
     
 ]
 

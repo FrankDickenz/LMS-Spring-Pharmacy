@@ -7739,3 +7739,163 @@ def grade_distribution_update(request, course_id):
         'grade_ranges': grade_ranges,
     }
     return render(request, 'learner/grade_distribution.html', context)
+
+
+def download_grade_template(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    assessments = Assessment.objects.filter(section__courses=course)
+    enrolled_users = [e.user for e in course.enrollments.select_related('user')]
+
+    # Membuat respons CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="grade_template_{course.course_name}.csv"'
+
+    writer = csv.writer(response)
+    # Menulis header CSV
+    writer.writerow(['Name', 'Email'] + [assessment.name for assessment in assessments])
+
+    # Menulis data siswa dan nilai (jika sudah ada)
+    for user in enrolled_users:
+        row = [user.get_full_name(), user.email]
+
+        # Menulis nilai setiap assessment untuk user
+        for assessment in assessments:
+            score_value = Decimal('0')
+
+            # Ambil nilai yang ada untuk setiap assessment
+            quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+            if quiz_result:
+                score_value = Decimal(quiz_result.score)
+            else:
+                # Cek hasil AssessmentResult atau LTIResult jika ada
+                ass_result = AssessmentResult.objects.filter(user=user, assessment=assessment).first()
+                if ass_result:
+                    score_value = Decimal(ass_result.score)
+                else:
+                    lti_result = LTIResult.objects.filter(user=user, assessment=assessment).first()
+                    if lti_result:
+                        score_value = Decimal(lti_result.score) * Decimal('100')
+
+            row.append(str(score_value))  # Menambahkan nilai ke baris
+        writer.writerow(row)
+
+    return response
+
+
+def update_grades(request, course_id):
+    if request.method == 'POST' and request.FILES['grade_file']:
+        course = get_object_or_404(Course, id=course_id)
+        grade_file = request.FILES['grade_file']
+        file_data = grade_file.read().decode('utf-8').splitlines()
+        csv_reader = csv.reader(file_data)
+
+        # Skip the header row
+        next(csv_reader)
+
+        with transaction.atomic():  # Ensure all updates happen within a single transaction
+            for row in csv_reader:
+                user_full_name, user_email, *scores = row
+                user = CustomUser.objects.filter(email=user_email).first()
+
+                if user:
+                    # Update each assessment based on the index in the CSV file
+                    for idx, score_str in enumerate(scores):
+                        try:
+                            score = int(score_str)
+                        except ValueError:
+                            continue  # Skip if the score is invalid
+
+                        # Get the assessment based on the index
+                        assessment = Assessment.objects.filter(section__courses=course).order_by('id')[idx]
+
+                        updated = False
+
+                        # 1️⃣ Update QuizResult if exists
+                        quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+                        if quiz_result:
+                            quiz_result.score = score
+                            quiz_result.save()
+                            updated = True
+                            print(f"Updated QuizResult for {user.username} - {assessment.name} with score {score}")
+                        else:
+                            # If no quiz_result, create a new one
+                            try:
+                                quiz = Quiz.objects.filter(assessment=assessment).first()
+                                if not quiz:
+                                    raise ValueError("No quiz found for this assessment")
+
+                                video = quiz.video
+                                if not video:
+                                    raise ValueError("No video associated with this quiz")
+
+                                total_questions = getattr(assessment, 'weight', 100)
+
+                                # Create new QuizResult
+                                QuizResult.objects.create(
+                                    user=user,
+                                    assessment=assessment,
+                                    video=video,
+                                    score=score,
+                                    total_questions=total_questions
+                                )
+                                updated = True
+                                print(f"Created new QuizResult for {user.username} - {assessment.name} with score {score}")
+                            except Exception as e:
+                                print(f"Error creating QuizResult: {e}")
+
+                        # 2️⃣ Update AssessmentResult (MCQ / Exam) if exists
+                        if not updated:
+                            ass_result = AssessmentResult.objects.filter(user=user, assessment=assessment).first()
+                            if ass_result:
+                                if ass_result.total_questions > 0:
+                                    new_correct = int(round((score / Decimal(assessment.weight)) * ass_result.total_questions))
+                                    ass_result.correct_answers = min(new_correct, ass_result.total_questions)
+                                ass_result.score = float(score)
+                                ass_result.save()
+                                updated = True
+                                print(f"Updated AssessmentResult for {user.username} - {assessment.name} with score {score}")
+                            else:
+                                # Create a new AssessmentResult if not found
+                                session, created = AssessmentSession.objects.get_or_create(
+                                    user=user,
+                                    assessment=assessment,
+                                    defaults={'start_time': timezone.now()}
+                                )
+                                AssessmentResult.objects.create(
+                                    user=user,
+                                    assessment=assessment,
+                                    session=session,
+                                    total_questions=getattr(assessment, 'weight', 100),
+                                    correct_answers=int(score),
+                                    score=float(score)
+                                )
+                                updated = True
+                                print(f"Created new AssessmentResult for {user.username} - {assessment.name} with score {score}")
+
+                        # 3️⃣ Update LTIResult if no other update happened
+                        if not updated and LTIResult.objects.filter(user=user, assessment=assessment).exists():
+                            lti_result = LTIResult.objects.get(user=user, assessment=assessment)
+                            lti_result.score = (score / Decimal('100'))
+                            lti_result.save()
+                            updated = True
+                            print(f"Updated LTIResult for {user.username} - {assessment.name} with score {score}")
+
+                        # 4️⃣ Update AssessmentScore (Essay / ORA)
+                        if not updated and AssessmentScore.objects.filter(
+                            submission__user=user,
+                            submission__askora__assessment=assessment
+                        ).exists():
+                            ass_score = AssessmentScore.objects.filter(
+                                submission__user=user,
+                                submission__askora__assessment=assessment
+                            ).first()
+                            ass_score.final_score = score
+                            ass_score.save()
+                            updated = True
+                            print(f"Updated AssessmentScore for {user.username} - {assessment.name} with score {score}")
+
+        messages.success(request, 'Nilai berhasil diperbarui dari file!')
+        return redirect('learner:grade_distribution', course_id=course_id)
+
+    messages.error(request, 'Tidak ada file yang diupload!')
+    return redirect('learner:grade_distribution', course_id=course_id)
