@@ -23,6 +23,7 @@ from .utils import generate_oauth_signature  # pastikan ada util ini
 from datetime import date
 from django.db import transaction
 # Third-party packages
+from datetime import timedelta
 import pytz
 import qrcode
 import bleach
@@ -7624,84 +7625,112 @@ def grade_distribution_update(request, course_id):
     table_data, assessments, grade_ranges = build_grade_table(course)
 
     if request.method == 'POST':
-        for row in table_data:
-            user = row['user']
-            for assessment in assessments:
-                input_name = f"score_{user.id}_{assessment.id}"
-                input_value = request.POST.get(input_name)
+        with transaction.atomic():  # Memastikan semua perubahan terjadi dalam satu transaksi
+            for row in table_data:
+                user = row['user']
+                for assessment in assessments:
+                    input_name = f"score_{user.id}_{assessment.id}"
+                    input_value = request.POST.get(input_name)
 
-                if input_value:
-                    try:
-                        score_value = Decimal(input_value)
-                    except:
-                        continue  # skip jika input invalid
-
-                    updated = False
-
-                    # 1️⃣ Update QuizResult jika ada
-                    quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
-                    if quiz_result:
-                        quiz_result.score = score_value
-                        quiz_result.save()
-                        updated = True
-                    # Jika belum ada QuizResult tapi ingin override → buat baru dengan video=None
-                    elif not quiz_result:
+                    if input_value:
                         try:
-                            QuizResult.objects.create(
+                            score_value = Decimal(input_value)
+                        except Exception as e:
+                            print(f"Error parsing score for {user.username}, assessment {assessment.name}: {e}")
+                            continue  # skip jika input invalid
+
+                        updated = False
+
+                        # 1️⃣ Update QuizResult jika ada
+                        quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+                        if quiz_result:
+                            print(f"Updating QuizResult for {user.username} - {assessment.name} with score {score_value}")
+                            quiz_result.score = score_value
+                            quiz_result.save()
+                            updated = True
+                        else:
+                            # Jika tidak ada quiz_result, buat yang baru
+                            try:
+                                # Ambil video terkait dari assessment
+                                # Coba menggunakan relasi langsung jika ada
+                                quiz = Quiz.objects.filter(assessment=assessment).first()  # Mengambil quiz pertama terkait assessment
+                                if not quiz:
+                                    print(f"Error: No quiz found for assessment {assessment.name} for user {user.username}")
+                                    raise ValueError("No quiz found for this assessment")  # Penanganan jika quiz tidak ada
+
+                                video = quiz.video  # Ambil video terkait dengan quiz tersebut
+                                
+                                if not video:
+                                    print(f"Error: No video associated with quiz {quiz.question} for user {user.username}")
+                                    raise ValueError("No video associated with this quiz")  # Penanganan jika video tidak ada
+
+                                total_questions = getattr(assessment, 'weight', 100)  # Bobot default 100, sesuaikan jika perlu
+
+                                # Periksa jika total_questions berasal dari data lain atau harus dihitung
+                                if 'total_questions' in request.POST:
+                                    total_questions = int(request.POST.get('total_questions'))  # Ambil nilai dari form atau sumber lain
+
+                                # Buat QuizResult baru jika belum ada
+                                print(f"Creating new QuizResult for {user.username} - {assessment.name} with score {score_value}")
+                                QuizResult.objects.create(
+                                    user=user,
+                                    assessment=assessment,
+                                    video=video,  # Gunakan video yang diambil dari quiz
+                                    score=score_value,
+                                    total_questions=total_questions
+                                )
+                                updated = True
+                            except Exception as e:
+                                print(f"Error creating QuizResult: {e}")
+
+                        # 2️⃣ Update AssessmentResult (MCQ / Exam)
+                        ass_result = AssessmentResult.objects.filter(user=user, assessment=assessment).first()
+                        if ass_result:
+                            if ass_result.total_questions > 0:
+                                new_correct = int(round((score_value / Decimal(assessment.weight)) * ass_result.total_questions))
+                                ass_result.correct_answers = min(new_correct, ass_result.total_questions)
+                            ass_result.score = float(score_value)
+                            ass_result.save()
+                            updated = True
+                        else:
+                            session, created = AssessmentSession.objects.get_or_create(
                                 user=user,
                                 assessment=assessment,
-                                video=None,  # ⚠ harus diisi jika model memerlukan
-                                score=score_value,
-                                total_questions=getattr(assessment, 'weight', 100)
+                                defaults={'start_time': timezone.now()}
+                            )
+                            AssessmentResult.objects.create(
+                                user=user,
+                                assessment=assessment,
+                                session=session,
+                                total_questions=getattr(assessment, 'weight', 100),
+                                correct_answers=int(score_value),
+                                score=float(score_value)
                             )
                             updated = True
-                        except:
-                            pass  # jika field NOT NULL, skip
 
-                    # 2️⃣ Update AssessmentResult (MCQ / Exam)
-                    if AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
-                        ass_result = AssessmentResult.objects.get(user=user, assessment=assessment)
-                        if ass_result.total_questions > 0:
-                            new_correct = int(round((score_value / Decimal(assessment.weight)) * ass_result.total_questions))
-                            ass_result.correct_answers = min(new_correct, ass_result.total_questions)
-                        ass_result.score = float(score_value)
-                        ass_result.save()
-                        updated = True
-                    else:
-                        # buat baru jika belum ada
-                        AssessmentResult.objects.create(
-                            user=user,
-                            assessment=assessment,
-                            session=None,
-                            total_questions=getattr(assessment, 'weight', 100),
-                            correct_answers=int(score_value),
-                            score=float(score_value)
-                        )
-                        updated = True
+                        # 3️⃣ Update LTIResult
+                        if not updated and LTIResult.objects.filter(user=user, assessment=assessment).exists():
+                            lti_result = LTIResult.objects.get(user=user, assessment=assessment)
+                            lti_result.score = (score_value / Decimal('100'))
+                            lti_result.save()
+                            updated = True
 
-                    # 3️⃣ Update LTIResult
-                    if not updated and LTIResult.objects.filter(user=user, assessment=assessment).exists():
-                        lti_result = LTIResult.objects.get(user=user, assessment=assessment)
-                        lti_result.score = (score_value / Decimal('100'))
-                        lti_result.save()
-                        updated = True
-
-                    # 4️⃣ Update AssessmentScore (Essay / ORA)
-                    if not updated and AssessmentScore.objects.filter(
-                        submission__user=user,
-                        submission__askora__assessment=assessment
-                    ).exists():
-                        ass_score = AssessmentScore.objects.filter(
+                        # 4️⃣ Update AssessmentScore (Essay / ORA)
+                        if not updated and AssessmentScore.objects.filter(
                             submission__user=user,
                             submission__askora__assessment=assessment
-                        ).first()
-                        ass_score.final_score = score_value
-                        ass_score.save()
-                        updated = True
+                        ).exists():
+                            ass_score = AssessmentScore.objects.filter(
+                                submission__user=user,
+                                submission__askora__assessment=assessment
+                            ).first()
+                            ass_score.final_score = score_value
+                            ass_score.save()
+                            updated = True
 
-        messages.success(request, "Nilai berhasil diperbarui!")
-        # reload table
-        table_data, assessments, grade_ranges = build_grade_table(course)
+            messages.success(request, "Nilai berhasil diperbarui!")
+            # reload table
+            table_data, assessments, grade_ranges = build_grade_table(course)
 
     context = {
         'course': course,

@@ -11,7 +11,7 @@
     <div class="overflow-x-auto bg-white shadow-md rounded-lg">
         <form method="POST" action="{% url 'courses:grade_distribution_update' course.id %}">
             {% csrf_token %}
-            <p>CSRF Token: {{ csrf_token }}</p>
+            
             <div class="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-800">

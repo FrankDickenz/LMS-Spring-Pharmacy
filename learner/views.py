@@ -2794,16 +2794,7 @@ def learner_detail(request, username):
 
     return render(request, 'learner/learner.html', context)
 
-
-# Fungsi helper per-assessment
 def calculate_assessment_score(user, assessment):
-    """
-    Hitung score per assessment, mendukung:
-    - LTIResult
-    - In-Video Quiz (QuizResult)
-    - MCQ (AssessmentResult)
-    - Askora / ORA / Essay (Submission + AssessmentScore)
-    """
     score_value = Decimal('0')
     is_submitted = True
 
@@ -2814,45 +2805,59 @@ def calculate_assessment_score(user, assessment):
         if lti_score > 1.0:  # jika nilai 0-100
             lti_score /= 100
         score_value = lti_score * Decimal(assessment.weight)
+        print(f"LTIResult found for user {user.username}, score: {score_value}")
 
-    # CASE 2: In-Video Quiz
-    elif QuizResult.objects.filter(user=user, assessment=assessment).exists():
-        quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).order_by('-created_at').first()
-        if quiz_result and quiz_result.total_questions > 0:
-            raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
-            score_value = raw_percentage * Decimal(assessment.weight)
+    else:
+        # CASE 2: In-Video Quiz
+        invideo_quizzes = Quiz.objects.filter(assessment=assessment)
+        if invideo_quizzes.exists():
+            quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).first()
+            if quiz_result and quiz_result.total_questions > 0:
+                raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
+                score_value = raw_percentage * Decimal(assessment.weight)
+                print(f"QuizResult found for user {user.username}, score: {score_value}")
+            else:
+                score_value = Decimal('0')  # Pastikan quiz kosong tetap 0
+                is_submitted = False
+                print(f"No valid QuizResult found for user {user.username}, score set to 0.")
+
         else:
-            is_submitted = False
-
-    # CASE 3: MCQ via AssessmentResult
-    elif AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
-        mcq_result = AssessmentResult.objects.filter(user=user, assessment=assessment).order_by('-submitted_at').first()
-        if mcq_result:
-            if mcq_result.total_questions > 0:
+            # CASE 3: MCQ (AssessmentResult)
+            mcq_result = AssessmentResult.objects.filter(user=user, assessment=assessment).first()
+            if mcq_result and mcq_result.total_questions > 0:
                 raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
                 score_value = raw_percentage * Decimal(assessment.weight)
+                print(f"MCQ result found for user {user.username}, score: {score_value}")
             else:
-                score_value = (Decimal(mcq_result.score) / 100) * Decimal(assessment.weight)
-        else:
-            is_submitted = False
-
-    # CASE 4: Askora / ORA / Essay
-    else:
-        submission = Submission.objects.filter(askora__assessment=assessment, user=user).order_by('-submitted_at').first()
-        if submission:
-            assessment_score = AssessmentScore.objects.filter(submission=submission).first()
-            if assessment_score and assessment_score.final_score is not None:
-                score_value = (Decimal(assessment_score.final_score) / Decimal(100)) * Decimal(assessment.weight)
-            else:
+                # Jika tidak ada submission MCQ
+                score_value = Decimal('0')
                 is_submitted = False
-        else:
-            is_submitted = False
+                print(f"No valid AssessmentResult found for user {user.username}, score set to 0.")
+
+            # CASE 4: Askora (Submission)
+            askora_subs = Submission.objects.filter(askora__assessment=assessment, user=user)
+            if askora_subs.exists():
+                latest_submission = askora_subs.order_by('-submitted_at').first()
+                assessment_score = AssessmentScore.objects.filter(submission=latest_submission).first()
+                if assessment_score:
+                    score_value = Decimal(assessment_score.final_score)
+                    print(f"Askora submission found for user {user.username}, score: {score_value}")
+                else:
+                    score_value = Decimal('0')
+                    is_submitted = False
+                    print(f"No valid AssessmentScore found for Askora submission for user {user.username}, score set to 0.")
+            else:
+                if not mcq_result:
+                    score_value = Decimal('0')
+                    is_submitted = False
+                    print(f"No Askora submission found for user {user.username}, score set to 0.")
 
     # Clamp score agar tidak melebihi weight
     score_value = min(score_value, Decimal(assessment.weight))
+    print(f"Calculated score value: {score_value}, for user: {user.username}, assessment: {assessment.name}")
     return score_value, is_submitted
 
-
+@login_required
 def grade_distribution_view(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     sections = course.sections.all()
@@ -2860,73 +2865,59 @@ def grade_distribution_view(request, course_id):
 
     enrolled_users = [e.user for e in course.enrollments.select_related('user')]
     table_data = []
+
     grade_ranges = course.grade_ranges.all()
 
-    if request.method == 'POST':
-        # Simpan override nilai
-        with transaction.atomic():
-            for user in enrolled_users:
-                for assessment in assessments:
-                    key = f"score_{user.id}_{assessment.id}"
-                    score_str = request.POST.get(key)
-                    if score_str not in (None, ''):
-                        try:
-                            score_value = Decimal(score_str)
-                        except:
-                            score_value = Decimal('0')
+    # Tentukan passing threshold
+    passing_threshold = Decimal('60')  # Default jika tidak ada range grade
+    if grade_ranges.exists():
+        lowest_range = grade_ranges.first()
+        passing_threshold = lowest_range.max_grade + 1
 
-                        # Update ke model yang relevan
-                        # Prioritas: AssessmentResult -> QuizResult -> LTIResult
-                        if AssessmentResult.objects.filter(user=user, assessment=assessment).exists():
-                            result = AssessmentResult.objects.get(user=user, assessment=assessment)
-                            result.score = float(score_value)
-                            result.save()
-                        elif QuizResult.objects.filter(user=user, assessment=assessment).exists():
-                            quiz_result = QuizResult.objects.filter(user=user, assessment=assessment).order_by('-created_at').first()
-                            quiz_result.score = int(score_value)
-                            quiz_result.save()
-                        elif LTIResult.objects.filter(user=user, assessment=assessment).exists():
-                            lti_result = LTIResult.objects.get(user=user, assessment=assessment)
-                            lti_result.score = float(score_value)/100  # convert ke 0-1
-                            lti_result.save()
-                        else:
-                            # jika belum ada, buat AssessmentResult baru
-                            # session dummy bisa dibuat atau dibiarkan null jika tidak wajib
-                            from courses.models import AssessmentSession
-                            session, _ = AssessmentSession.objects.get_or_create(user=user, assessment=assessment, defaults={'start_time': timezone.now(), 'end_time': timezone.now()})
-                            AssessmentResult.objects.create(user=user, assessment=assessment, session=session, score=float(score_value))
-
-        return redirect('courses:grade_distribution', course_id=course.id)
-
-    # BUILD TABLE DATA
+    # Loop untuk setiap user
     for user in enrolled_users:
         scores = {}
         total_score = Decimal('0')
         total_max = Decimal('0')
+        all_assessments_submitted = True
 
         for assessment in assessments:
+            # Menggunakan helper function untuk menghitung score per assessment
             score_value, is_submitted = calculate_assessment_score(user, assessment)
+
+            # Debug: Menampilkan skor assessment setiap user
+            print(f"User: {user.username}, Assessment: {assessment.name}, Score: {score_value}")
+
             scores[assessment.id] = round(score_value, 2)
             total_score += score_value
             total_max += Decimal(assessment.weight)
 
+            # Cek apakah semua assessment sudah disubmit
+            if not is_submitted:
+                all_assessments_submitted = False
+
+        # Menghitung rata-rata
         average = (total_score / total_max * Decimal('100')) if total_max > 0 else Decimal('0')
 
+        # Menentukan grade berdasarkan rata-rata
         grade_name = '-'
         for gr in grade_ranges:
             if gr.min_grade <= average <= gr.max_grade:
                 grade_name = gr.name
                 break
 
+        # Simpan ke table_data
         table_data.append({
             'user': user,
             'scores': scores,
             'total_score': round(total_score, 2),
             'total_max': round(total_max, 2),
             'average': round(average, 2),
-            'grade': grade_name
+            'grade': grade_name,
+            'status': "Pass" if all_assessments_submitted else "Fail"
         })
 
+    # Sort data berdasarkan rata-rata tertinggi
     table_data.sort(key=lambda x: x['average'], reverse=True)
 
     context = {
@@ -2936,8 +2927,3 @@ def grade_distribution_view(request, course_id):
     }
 
     return render(request, 'learner/grade_distribution.html', context)
-
-
-
-
-

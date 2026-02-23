@@ -1125,9 +1125,14 @@ class AssessmentSession(models.Model):
     start_time = models.DateTimeField()  # Waktu mulai ujian
     end_time = models.DateTimeField()  # Waktu selesai ujian, dihitung berdasarkan durasi
 
+    
     def save(self, *args, **kwargs):
-        # Menghitung waktu berakhir berdasarkan waktu mulai dan durasi
-        self.end_time = self.start_time + timedelta(minutes=self.assessment.duration_in_minutes)
+        # Pastikan durasi tidak None sebelum menggunakan timelength
+        if self.assessment.duration_in_minutes is not None:
+            self.end_time = self.start_time + timedelta(minutes=self.assessment.duration_in_minutes)
+        else:
+            # Tentukan default jika durasi tidak ada, misalnya 60 menit
+            self.end_time = self.start_time + timedelta(minutes=60)  # Durasi default 60 menit
         super().save(*args, **kwargs)
 
     def __str__(self):
