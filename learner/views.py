@@ -2805,7 +2805,7 @@ def calculate_assessment_score(user, assessment):
         if lti_score > 1.0:  # jika nilai 0-100
             lti_score /= 100
         score_value = lti_score * Decimal(assessment.weight)
-        print(f"LTIResult found for user {user.username}, score: {score_value}")
+        
 
     else:
         # CASE 2: In-Video Quiz
@@ -2815,11 +2815,11 @@ def calculate_assessment_score(user, assessment):
             if quiz_result and quiz_result.total_questions > 0:
                 raw_percentage = Decimal(quiz_result.score) / Decimal(quiz_result.total_questions)
                 score_value = raw_percentage * Decimal(assessment.weight)
-                print(f"QuizResult found for user {user.username}, score: {score_value}")
+                
             else:
                 score_value = Decimal('0')  # Pastikan quiz kosong tetap 0
                 is_submitted = False
-                print(f"No valid QuizResult found for user {user.username}, score set to 0.")
+                
 
         else:
             # CASE 3: MCQ (AssessmentResult)
@@ -2827,12 +2827,12 @@ def calculate_assessment_score(user, assessment):
             if mcq_result and mcq_result.total_questions > 0:
                 raw_percentage = Decimal(mcq_result.correct_answers) / Decimal(mcq_result.total_questions)
                 score_value = raw_percentage * Decimal(assessment.weight)
-                print(f"MCQ result found for user {user.username}, score: {score_value}")
+                
             else:
                 # Jika tidak ada submission MCQ
                 score_value = Decimal('0')
                 is_submitted = False
-                print(f"No valid AssessmentResult found for user {user.username}, score set to 0.")
+                
 
             # CASE 4: Askora (Submission)
             askora_subs = Submission.objects.filter(askora__assessment=assessment, user=user)
@@ -2841,20 +2841,20 @@ def calculate_assessment_score(user, assessment):
                 assessment_score = AssessmentScore.objects.filter(submission=latest_submission).first()
                 if assessment_score:
                     score_value = Decimal(assessment_score.final_score)
-                    print(f"Askora submission found for user {user.username}, score: {score_value}")
+                   
                 else:
                     score_value = Decimal('0')
                     is_submitted = False
-                    print(f"No valid AssessmentScore found for Askora submission for user {user.username}, score set to 0.")
+                   
             else:
                 if not mcq_result:
                     score_value = Decimal('0')
                     is_submitted = False
-                    print(f"No Askora submission found for user {user.username}, score set to 0.")
+                   
 
     # Clamp score agar tidak melebihi weight
     score_value = min(score_value, Decimal(assessment.weight))
-    print(f"Calculated score value: {score_value}, for user: {user.username}, assessment: {assessment.name}")
+    
     return score_value, is_submitted
 
 @login_required
@@ -2885,8 +2885,7 @@ def grade_distribution_view(request, course_id):
             # Menggunakan helper function untuk menghitung score per assessment
             score_value, is_submitted = calculate_assessment_score(user, assessment)
 
-            # Debug: Menampilkan skor assessment setiap user
-            print(f"User: {user.username}, Assessment: {assessment.name}, Score: {score_value}")
+           
 
             scores[assessment.id] = round(score_value, 2)
             total_score += score_value
