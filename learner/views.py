@@ -8,15 +8,18 @@ from multiprocessing import context
 from urllib import request
 import uuid
 import base64
+from django.conf import settings
 import xml.etree.ElementTree as ET
 import oauthlib.oauth1
 import hmac
 import hashlib
+from django.core.mail import send_mail, BadHeaderError, EmailMessage, EmailMultiAlternatives, get_connection
 import urllib.parse
 from urllib.parse import urlparse, urlunparse,quote, urlencode,parse_qsl
 from datetime import datetime
 import time
 import pytz
+from learner.tasks import send_invite_email
 from collections import defaultdict
 from datetime import timedelta
 from decimal import Decimal
@@ -128,19 +131,31 @@ def invite_learner(request, course_id):
     course = get_object_or_404(Course, id=course_id)
 
     if request.method == "POST":
-        emails_raw = request.POST.get("emails", "").strip()  # multiple emails
+        emails_raw = request.POST.get("emails", "").strip()
         if not emails_raw:
             messages.error(request, "Please provide at least one email.")
             return redirect(request.META.get('HTTP_REFERER', '/'))
 
-        # Pisahkan email pakai koma atau spasi
         emails = [e.strip() for e in emails_raw.replace(',', ' ').split() if e.strip()]
         if not emails:
             messages.error(request, "No valid emails found.")
             return redirect(request.META.get('HTTP_REFERER', '/'))
 
+        # Cek pengaturan email
+        try:
+            send_mail(
+                "Test Email",
+                "This is a test email to check if the email settings are configured properly.",
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.DEFAULT_FROM_EMAIL],
+                fail_silently=False
+            )
+        except Exception:
+            messages.error(request, "Email settings are not configured correctly. Please check your email settings.")
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
         for email in emails:
-            # Validasi format sederhana
+            # Validasi email sederhana
             if "@" not in email or "." not in email:
                 messages.warning(request, f"{email} is not a valid email. Skipped.")
                 continue
@@ -151,30 +166,15 @@ def invite_learner(request, course_id):
                 continue
 
             # Buat enrollment jika belum ada
-            enrollment, created = Enrollment.objects.get_or_create(
-                user=user,
-                course=course
-            )
+            enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
 
             if not created:
                 messages.info(request, f"{user.username} is already enrolled. Skipped.")
                 continue
 
-            # Kirim email
-            subject = f"You have been enrolled in {course.course_name}"
-            message = (
-                f"Hello {user.username},\n\n"
-                f"You have been enrolled in the course '{course.course_name}'.\n"
-                f"Please login to access the course.\n\nThanks!"
-            )
-
-            try:
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
-                messages.success(request, f"{user.username} enrolled & email sent.")
-            except (smtplib.SMTPException, BadHeaderError):
-                messages.warning(request,
-                    f"{user.username} enrolled, but email failed. Check settings."
-                )
+            # Kirim email pakai Celery (async)
+            send_invite_email.delay(email, user.username, course.course_name)
+            messages.success(request, f"{user.username} enrolled. Email will be sent in background.")
 
         return redirect(request.META.get('HTTP_REFERER', '/'))
 

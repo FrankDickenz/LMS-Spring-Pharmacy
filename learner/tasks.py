@@ -5,6 +5,12 @@ from datetime import timedelta
 from courses.models import CourseSessionLog  # Ganti dengan path model Anda
 import logging
 
+from celery import shared_task
+from django.core.mail import send_mail
+from django.conf import settings
+import smtplib
+from django.core.mail import BadHeaderError
+
 logger = logging.getLogger(__name__)
 
 @shared_task
@@ -21,3 +27,19 @@ def close_idle_sessions():
         logger.info(f"Auto-closed idle session for user {session.user.id}, course {session.course.id}, duration: {session.duration_seconds} seconds")
         closed_count += 1
     logger.info(f"Closed {closed_count} idle sessions")
+
+
+
+@shared_task
+def send_invite_email(email, username, course_name):
+    subject = f"You have been enrolled in {course_name}"
+    message = (
+        f"Hello {username},\n\n"
+        f"You have been enrolled in the course '{course_name}'.\n"
+        f"Please login to access the course.\n\nThanks!"
+    )
+    try:
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
+        return f"Email sent to {username}"
+    except (smtplib.SMTPException, BadHeaderError) as e:
+        return f"Email failed for {username}: {e}"
