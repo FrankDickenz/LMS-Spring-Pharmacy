@@ -1043,7 +1043,7 @@ def reply_comment(request, comment_id):
     parent_comment = get_object_or_404(Comment, id=comment_id)
     content = request.POST.get('content')
 
-    if not content:
+    if not content or not content.strip():
         return HttpResponseBadRequest("Isi komentar tidak boleh kosong.")
 
     # Buat reply
@@ -1054,20 +1054,99 @@ def reply_comment(request, comment_id):
         parent=parent_comment,
     )
 
-    # Kirim notifikasi ke peserta yang punya komentar asli
     original_user = parent_comment.user
+    
+    # Hanya kirim notifikasi jika bukan self-reply
     if original_user != request.user:
-        Notification.objects.create(
-            user=original_user,                    # peserta asli
-            actor=request.user,                     # admin/instructor yang membalas
-            notif_type='reply_comment',             # tambahkan di Notification.NOTIF_TYPES
-            priority='medium',
-            title=f"Reply on your comment in {parent_comment.material.title}",
-            message=f"{request.user.username} replied to your comment on '{parent_comment.material.title}' in {parent_comment.material.section.courses.course_name}.",
-            link=f'/courses/{parent_comment.material.section.courses.id}/materials/{parent_comment.material.id}/#comment-{reply.id}'
-        )
+        print("=== DEBUG: Masuk blok notifikasi ===")
+        print(f"  - Komentar asli milik     : {original_user.username}")
+        print(f"  - Reply dari              : {request.user.username}")
+        
+        try:
+            course = parent_comment.material.section.courses
+            
+            # Ambil data course dengan aman
+            course_id = course.id
+            course_slug = course.slug if course.slug else 'no-slug'  # fallback kalau slug kosong
+            course_name = course.course_name or course.title or "Kursus"
+            
+            # Username TARGET = pemilik komentar (yang nerima notif)
+            target_username = original_user.username
+            
+            # Bangun link sesuai pola route load_content
+            link = (
+                f'/{target_username}/'
+                f'{course_id}/'
+                f'{course_slug}/'
+                f'material/'                   # sesuai <str:content_type>
+                f'{parent_comment.material.id}/'
+                f'#comment-{reply.id}'
+            )
+            
+            # Versi pakai reverse (lebih direkomendasikan jika URL sering berubah)
+            # link = reverse('load_content', kwargs={
+            #     'username': target_username,
+            #     'id': course_id,
+            #     'slug': course_slug,
+            #     'content_type': 'material',
+            #     'content_id': parent_comment.material.id,
+            # }) + f'#comment-{reply.id}'
+            
+            Notification.objects.create(
+                user=original_user,
+                actor=request.user,
+                notif_type='reply_comment',
+                priority='medium',
+                title=f"Balasan pada komentar Anda di {parent_comment.material.title}",
+                message=(
+                    f"{request.user.username} membalas komentar Anda "
+                    f"pada '{parent_comment.material.title}' "
+                    f"di {course_name}."
+                ),
+                link=link
+            )
+            
+            print("Notifikasi BERHASIL dibuat")
+            print(f"  → Link: {link}")
+        
+        except AttributeError as attr_err:
+            print("AttributeError saat membangun link notifikasi:", str(attr_err))
+            # Fallback link tetap pakai username target
+            fallback_link = (
+                f'/{original_user.username}/'
+                f'{course.id}/'
+                f'{course.slug or "course"}/'
+                f'material/'
+                f'{parent_comment.material.id}/'
+                f'#comment-{reply.id}'
+            )
+            try:
+                Notification.objects.create(
+                    user=original_user,
+                    actor=request.user,
+                    notif_type='reply_comment',
+                    priority='medium',
+                    title=f"Balasan pada komentar Anda di {parent_comment.material.title}",
+                    message=f"{request.user.username} membalas komentar Anda.",
+                    link=fallback_link
+                )
+                print("Notifikasi dibuat dengan FALLBACK link:", fallback_link)
+            except Exception as inner_e:
+                print("Gagal membuat notifikasi fallback juga:", str(inner_e))
+        
+        except Exception as e:
+            print("Error tak terduga saat membuat notifikasi:", str(e))
+            import traceback
+            traceback.print_exc()
 
-    return render(request, 'admin/partials/comment_item.html', {'comment': reply})
+    # Kembalikan partial HTML untuk HTMX atau AJAX refresh
+    return render(request, 'admin/partials/comment_item.html', {
+        'comment': reply,
+        # Optional: tambah context lain kalau partial butuh lebih banyak data
+        # 'material': parent_comment.material,
+        # 'course': course,
+    })
+
 
 
 @custom_ratelimit

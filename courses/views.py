@@ -4814,7 +4814,7 @@ def enroll_course(request, course_id):
                 priority='medium',
                 title=f"{user.username} enrolled in {course.course_name}",
                 message=f"{user.username} has just enrolled in your course '{course.course_name}'.",
-                link=f'/courses/{course.id}/manage/'
+                link=f'/course-list-enroll/{course.id}/'
             )
         
         # Notification for the learner themselves
@@ -4825,7 +4825,7 @@ def enroll_course(request, course_id):
             priority='medium',
             title=f"You have enrolled in {course.course_name}",
             message=f"Congratulations! You have successfully enrolled in the course '{course.course_name}'.",
-            link=f'/courses/{course.id}/learn/'   # link to the course learning page
+            link=f'/course-detail/{course.id}/{course.slug}/'   # link to the course learning page
         )
         
         return redirect('learner:course_learn', username=user.username, id=course.id, slug=course.slug)
