@@ -29,6 +29,7 @@ from django.core.mail import send_mail
 from authentication.forms import  UserProfileForm, UserPhoto,PasswordResetForms
 from .models import Profile
 from courses.models import AssessmentResult,CoursePrice,QuizResult,Quiz,LTIResult,Certificate,Comment,LastAccessCourse,UserActivityLog,SearchHistory,Instructor,CourseRating,Partner,Assessment,GradeRange,AssessmentRead,Material, MaterialRead, Submission,AssessmentScore,QuestionAnswer,CourseStatus,Enrollment,MicroCredential, MicroCredentialEnrollment,Course, Enrollment, Category,CourseProgress
+from notification.models import Notification
 from .forms import CommentForm
 from django.http import HttpResponse,JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -1038,21 +1039,35 @@ def comments_dashboard(request):
 @custom_ratelimit
 @login_required
 @require_POST
-@login_required
 def reply_comment(request, comment_id):
     parent_comment = get_object_or_404(Comment, id=comment_id)
     content = request.POST.get('content')
 
-    if content:
-        reply = Comment.objects.create(
-            user=request.user,
-            content=content,
-            material=parent_comment.material,
-            parent=parent_comment,
-        )
-        return render(request, 'admin/partials/comment_item.html', {'comment': reply})
-    else:
+    if not content:
         return HttpResponseBadRequest("Isi komentar tidak boleh kosong.")
+
+    # Buat reply
+    reply = Comment.objects.create(
+        user=request.user,
+        content=content,
+        material=parent_comment.material,
+        parent=parent_comment,
+    )
+
+    # Kirim notifikasi ke peserta yang punya komentar asli
+    original_user = parent_comment.user
+    if original_user != request.user:
+        Notification.objects.create(
+            user=original_user,                    # peserta asli
+            actor=request.user,                     # admin/instructor yang membalas
+            notif_type='reply_comment',             # tambahkan di Notification.NOTIF_TYPES
+            priority='medium',
+            title=f"Reply on your comment in {parent_comment.material.title}",
+            message=f"{request.user.username} replied to your comment on '{parent_comment.material.title}' in {parent_comment.material.section.courses.course_name}.",
+            link=f'/courses/{parent_comment.material.section.courses.id}/materials/{parent_comment.material.id}/#comment-{reply.id}'
+        )
+
+    return render(request, 'admin/partials/comment_item.html', {'comment': reply})
 
 
 @custom_ratelimit

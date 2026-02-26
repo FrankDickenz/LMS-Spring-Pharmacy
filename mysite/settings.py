@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-*t=li&h7o=sj40!ic&)p+8!fy3p@*tfg+mz6!xuftigv_qa9yy
 #=============================== for development ===============================
 DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1']
-#ALLOWED_REFERER = 'http://127.0.0.1:8000'
+ALLOWED_REFERER = 'http://127.0.0.1:8000'
 #=============================== end development ===============================
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -55,6 +55,8 @@ ALLOWED_HOSTS = ['127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',               
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -93,15 +95,27 @@ INSTALLED_APPS = [
     'dal',
     'dal_select2',#selct2 server
     'widget_tweaks',
+    'notification',  # Aplikasi untuk notifikasi real-time
  
     
 ]
+ASGI_APPLICATION = 'mysite.asgi.application' 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],   # sesuaikan kalau Redis kamu di tempat lain / pakai password
+            # "symmetric_encryption_keys": [SECRET_KEY],  # optional, untuk enkripsi
+        },
+    },
+}
 # LTI Settings your domain
 #LTI_PLATFORM_ISS = ""
 
 MIDDLEWARE = [
     #'django.middleware.security.SecurityMiddleware',
     'axes.middleware.AxesMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'csp.middleware.CSPMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

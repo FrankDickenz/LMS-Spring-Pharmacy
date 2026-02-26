@@ -1,0 +1,59 @@
+{% extends 'home/tes.html' %}
+{% load static %}
+{% load extra_filters %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Notifications</h1>
+
+<ul>
+    {% for notif in notifications %}
+        <li class="mb-2 p-3 border-b flex justify-between items-center rounded 
+                   {% if not notif.is_read %}bg-blue-50{% else %}bg-white{% endif %}">
+            <a href="{% url 'notification:mark_as_read' notif.id %}" class="flex justify-between w-full items-center">
+                <div>
+                    <strong class="{% if not notif.is_read %}font-bold{% else %}font-normal text-gray-600{% endif %}">
+                        {{ notif.title }}
+                    </strong> 
+                    <br>
+                    <span class="{% if notif.is_read %}text-gray-500{% else %}text-gray-700{% endif %}">
+                        {{ notif.message }}
+                    </span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="text-sm text-gray-400">
+                        {{ notif.created_at|date:"d M Y H:i" }}
+                    </div>
+                    {% if not notif.is_read %}
+                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                            NEW
+                        </span>
+                    {% endif %}
+                </div>
+            </a>
+        </li>
+    {% empty %}
+        <li class="text-gray-500 p-2">No notifications.</li>
+    {% endfor %}
+</ul>
+
+<!-- Pagination controls -->
+{% if notifications.has_other_pages %}
+<div class="mt-4 flex justify-center space-x-2">
+    {% if notifications.has_previous %}
+        <a href="?page={{ notifications.previous_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">&laquo; Previous</a>
+    {% else %}
+        <span class="px-3 py-1 bg-gray-100 rounded text-gray-400">&laquo; Previous</span>
+    {% endif %}
+
+    <span class="px-3 py-1 bg-gray-100 rounded">Page {{ notifications.number }} of {{ notifications.paginator.num_pages }}</span>
+
+    {% if notifications.has_next %}
+        <a href="?page={{ notifications.next_page_number }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Next &raquo;</a>
+    {% else %}
+        <span class="px-3 py-1 bg-gray-100 rounded text-gray-400">Next &raquo;</span>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock content %}

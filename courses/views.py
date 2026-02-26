@@ -104,6 +104,7 @@ from .models import (
 
 # Project-level apps
 from authentication.models import CustomUser, Universiti
+from notification.models import Notification
 from blog.models import BlogPost
 from licensing.models import License
 from payments.models import Payment
@@ -4802,6 +4803,31 @@ def enroll_course(request, course_id):
 
     if response["status"] == "success":
         messages.success(request, response["message"])
+        
+        # Notification for the instructor
+        instructor = course.instructor
+        if instructor:
+            Notification.objects.create(
+                user=instructor.user,          # linked to CustomUser
+                actor=user,                     # the learner who enrolled
+                notif_type='enrollment_success',
+                priority='medium',
+                title=f"{user.username} enrolled in {course.course_name}",
+                message=f"{user.username} has just enrolled in your course '{course.course_name}'.",
+                link=f'/courses/{course.id}/manage/'
+            )
+        
+        # Notification for the learner themselves
+        Notification.objects.create(
+            user=user,                          # the learner
+            actor=instructor.user if instructor else None,  # who triggered it, can be instructor or None
+            notif_type='enrollment_success',
+            priority='medium',
+            title=f"You have enrolled in {course.course_name}",
+            message=f"Congratulations! You have successfully enrolled in the course '{course.course_name}'.",
+            link=f'/courses/{course.id}/learn/'   # link to the course learning page
+        )
+        
         return redirect('learner:course_learn', username=user.username, id=course.id, slug=course.slug)
 
     elif response["status"] == "error":

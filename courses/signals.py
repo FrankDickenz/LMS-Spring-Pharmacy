@@ -157,3 +157,7 @@ def create_default_pricing_types(sender, **kwargs):
 
     for item in data:
         PricingType.objects.get_or_create(code=item["code"], defaults=item)
+
+
+
+

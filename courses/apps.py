@@ -8,6 +8,7 @@ class CoursesConfig(AppConfig):
 
     def ready(self):
         from .models import PricingType
+        
 
         def create_default_pricing_types(sender, **kwargs):
             defaults = [

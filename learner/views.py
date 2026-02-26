@@ -8,6 +8,7 @@ from multiprocessing import context
 from urllib import request
 import uuid
 import base64
+from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 import xml.etree.ElementTree as ET
 import oauthlib.oauth1
@@ -38,6 +39,7 @@ from django.template.defaultfilters import linebreaks
 from collections import OrderedDict
 from django.middleware.csrf import get_token
 from authentication.models import CustomUser, Universiti
+from notification.models import Notification
 from django.template.loader import render_to_string
 from django.db.models.functions import TruncMonth
 from django.utils.timezone import now,timedelta
@@ -2302,6 +2304,18 @@ def add_comment(request):
         message = "Komentar mengandung kata-kata yang tidak diizinkan."
     else:
         comment.save()
+        # Kirim notifikasi ke instructor hanya jika instructor ada dan bukan diri sendiri
+        instructor_user = course.instructor.user if course.instructor else None
+        if instructor_user and instructor_user != request.user:
+            Notification.objects.create(
+                user=instructor_user,                 # instructor
+                actor=request.user,                   # peserta yang komentar
+                notif_type='new_comment',             # tipe notif, tambahkan di Notification.NOTIF_TYPES
+                priority='medium',
+                title=f"New comment on {material.title}",
+                message=f"{request.user.username} commented on '{material.title}' in {course.course_name}.",
+                link=f'/courses/{course.id}/materials/{material.id}/#comments'  # deep link ke komentar
+            )
         logger.debug(f"Comment added by {request.user.username} for material {material_id}, parent_id={parent_id}")
 
     # Context untuk template partial
@@ -2429,29 +2443,33 @@ def submit_peer_review_new(request, submission_id):
     """
     submission = get_object_or_404(Submission, id=submission_id)
     assessment = submission.askora.assessment
-    course = assessment.section.courses  # Menggunakan courses, bukan course
+    course = assessment.section.courses  # Gunakan courses relasi
+    user = request.user
 
     if request.method != 'POST':
-        logger.warning(f"Metode tidak valid untuk submit_peer_review_new oleh {request.user.username}")
+        logger.warning(f"Metode tidak valid untuk submit_peer_review_new oleh {user.username}")
         return HttpResponse('<div class="alert alert-danger">Metode request tidak valid.</div>', status=400)
 
     logger.debug(f"POST data untuk review submission {submission_id}: {request.POST}")
 
-    if PeerReview.objects.filter(reviewer=request.user).count() >= 5:
-        logger.warning(f"Pengguna {request.user.username} telah mencapai batas maksimum 5 review")
+    # Batasi jumlah review per user
+    if PeerReview.objects.filter(reviewer=user).count() >= 5:
+        logger.warning(f"Pengguna {user.username} telah mencapai batas maksimum 5 review")
         messages.warning(request, "Anda telah memberikan jumlah review maksimal yang diperbolehkan.")
         return render_content(request, assessment, course)
 
-    if PeerReview.objects.filter(submission=submission, reviewer=request.user).exists():
-        logger.warning(f"Pengguna {request.user.username} mencoba mereview ulang submission {submission_id}")
+    # Cek apakah user sudah review submission ini
+    if PeerReview.objects.filter(submission=submission, reviewer=user).exists():
+        logger.warning(f"Pengguna {user.username} mencoba mereview ulang submission {submission_id}")
         messages.warning(request, "Anda sudah mereview submisi ini.")
         return render_content(request, assessment, course)
 
     try:
+        # Ambil score dan validasi
         score_raw = request.POST.get('score')
-        logger.debug(f"Nilai review untuk submission {submission_id}: {score_raw}")
+        if not score_raw:
+            raise ValueError("Score tidak boleh kosong")
         score = int(score_raw)
-
         if not 1 <= score <= 5:
             raise ValueError("Nilai harus antara 1 hingga 5")
 
@@ -2460,27 +2478,45 @@ def submit_peer_review_new(request, submission_id):
         # Buat objek PeerReview
         peer_review = PeerReview.objects.create(
             submission=submission,
-            reviewer=request.user,
+            reviewer=user,
             score=score,
             comment=comment or None
         )
-        logger.info(f"Peer review berhasil dibuat untuk submission {submission_id} oleh {request.user.username}")
+        logger.info(f"Peer review berhasil dibuat untuk submission {submission_id} oleh {user.username}")
 
-        # Hitung skor final
+        # Kirim notifikasi ke owner submission
+        owner_user = submission.user
+        if owner_user != user:
+            Notification.objects.create(
+                user=owner_user,
+                actor=user,  # reviewer
+                notif_type='submission_received',  # pastikan ada di Notification.NOTIF_TYPES
+                priority='medium',
+                title=f"Your submission received a review",
+                message=f"{user.username} reviewed your submission for '{assessment.title}' in {course.course_name}.",
+                link=f'/courses/{course.id}/assessments/{assessment.id}/submissions/{submission.id}/',
+                content_type=ContentType.objects.get_for_model(peer_review),
+                object_id=peer_review.id
+            )
+            logger.debug(f"Notification dikirim ke {owner_user.username} untuk submission {submission_id}")
+
+        # Hitung skor final submission
         assessment_score, _ = AssessmentScore.objects.get_or_create(submission=submission)
         assessment_score.calculate_final_score()
         logger.debug(f"Skor final dihitung untuk submission {submission_id}")
 
-        # Tambahkan pesan sukses
+        # Berikan feedback sukses ke reviewer
         messages.success(request, "Review berhasil dikirim!")
 
         # Render ulang halaman assessment
         return render_content(request, assessment, course)
 
     except Exception as e:
-        logger.exception(f"Gagal menyimpan review untuk submission {submission_id} oleh {request.user.username}: {str(e)}")
+        logger.exception(f"Gagal menyimpan review untuk submission {submission_id} oleh {user.username}: {str(e)}")
         messages.error(request, f"Error: {str(e)}")
         return render_content(request, assessment, course)
+
+
 
 def render_content(request, assessment, course):
     """
