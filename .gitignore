@@ -1,4 +1,5 @@
 .env
 .venv
+.venv6
 *.log
 __pycache__/
