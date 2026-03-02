@@ -7653,3 +7653,10 @@ AttributeError: 'Assessment' object has no attribute 'title'
 [INFO] 2026-03-02 07:47:11,645 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:10 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
 [DEBUG] 2026-03-02 07:47:11,646 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
 [INFO] 2026-03-02 07:47:16,143 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=56722)
+[INFO] 2026-03-02 07:48:11,640 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=49714)
+[INFO] 2026-03-02 07:48:11,646 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=56720)
+[INFO] 2026-03-02 07:48:11,646 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=56706)
+[INFO] 2026-03-02 07:49:28,130 [daphne.server] Received SIGINT, shutting down.
+[INFO] 2026-03-02 07:49:28,131 [daphne.server] Killed 0 pending application instances
+[INFO] 2026-03-02 07:49:28,132 [daphne.server] (TCP Port 8000 Closed)
+[INFO] 2026-03-02 07:49:28,132 [daphne.server] Stopping factory <daphne.http_protocol.HTTPFactory object at 0x7e703b018a90>
