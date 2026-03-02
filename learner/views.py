@@ -12,6 +12,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 import xml.etree.ElementTree as ET
 import oauthlib.oauth1
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 import hmac
 import hashlib
 from django.core.mail import send_mail, BadHeaderError, EmailMessage, EmailMultiAlternatives, get_connection
@@ -1544,6 +1546,53 @@ def load_content(request, username, id, slug, content_type, content_id):
         prog.progress_percentage = calculate_course_progress(request.user, course)
         prog.save()
 
+        # ================= CHECK COMPLETION =================
+        grade_ranges = GradeRange.objects.filter(course=course).order_by('max_grade')
+        if grade_ranges.exists():
+            lowest_range = grade_ranges.first()
+            passing_threshold = Decimal(lowest_range.max_grade) + Decimal(1)
+        else:
+            passing_threshold = Decimal('60')
+
+        overall_percentage = Decimal(prog.progress_percentage)
+
+        if overall_percentage >= passing_threshold:
+
+            already_notified = Notification.objects.filter(
+                user=request.user,
+                notif_type='course_completed',
+                link=f'/courses/{course.id}/'
+            ).exists()
+
+            if not already_notified:
+
+                notif = Notification.objects.create(
+                    user=request.user,
+                    actor=request.user,
+                    notif_type='course_completed',
+                    priority='high',
+                    title=f"You completed {course.course_name} 🎉",
+                    message=f"Congratulations! You have successfully completed {course.course_name}.",
+                    link=f'/courses/{course.id}/'
+                )
+
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f"user_{request.user.id}",
+                    {
+                        "type": "send_notification",
+                        "id": notif.id,
+                        "notif_type": notif.notif_type,
+                        "title": notif.title,
+                        "message": notif.message,
+                        "link": notif.link,
+                        "created_at": notif.created_at,
+                        "actor_username": request.user.username,
+                    }
+                )
+
+
+
     # Simpan konten saat ini untuk next time
     request.session['prev_content_type'] = content_type
     request.session['prev_content_id'] = content_id
@@ -2314,7 +2363,7 @@ def add_comment(request):
                 priority='medium',
                 title=f"New comment on {material.title}",
                 message=f"{request.user.username} commented on '{material.title}' in {course.course_name}.",
-                link=f'/courses/{course.id}/materials/{material.id}/#comments'  # deep link ke komentar
+                link=f'/message_comment'  # deep link ke komentar
             )
         logger.debug(f"Comment added by {request.user.username} for material {material_id}, parent_id={parent_id}")
 

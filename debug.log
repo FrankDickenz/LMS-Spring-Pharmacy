@@ -7131,3 +7131,525 @@ AttributeError: 'Assessment' object has no attribute 'title'
 [DEBUG] 2026-02-26 13:11:39,118 [daphne.ws_protocol] WebSocket closed for ['127.0.0.1', 45776]
 [DEBUG] 2026-02-26 13:11:39,119 [daphne.ws_protocol] WebSocket closed for ['127.0.0.1', 37032]
 [DEBUG] 2026-02-26 13:11:39,120 [daphne.ws_protocol] WebSocket closed for ['127.0.0.1', 45750]
+[INFO] 2026-03-02 07:31:37,404 [axes.apps] AXES: BEGIN version 8.0.0, blocking by username or ip_address
+[INFO] 2026-03-02 07:39:45,485 [axes.apps] AXES: BEGIN version 8.0.0, blocking by username or ip_address
+[INFO] 2026-03-02 07:39:45,489 [daphne.cli] Starting server at tcp:port=8000:interface=127.0.0.1
+[INFO] 2026-03-02 07:39:45,489 [daphne.server] HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+[INFO] 2026-03-02 07:39:45,490 [daphne.server] Configuring endpoint tcp:port=8000:interface=127.0.0.1
+[INFO] 2026-03-02 07:39:45,490 [daphne.server] HTTPFactory starting on 8000
+[INFO] 2026-03-02 07:39:45,490 [daphne.server] Starting factory <daphne.http_protocol.HTTPFactory object at 0x7622e0708ac0>
+[INFO] 2026-03-02 07:39:45,490 [daphne.server] Listening on TCP address 127.0.0.1:8000
+[DEBUG] 2026-03-02 07:39:52,070 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:52,703 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:52,704 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44764]
+[INFO] 2026-03-02 07:39:52,704 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:52 +0000] "GET / HTTP/1.1" 200 39592 "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:52,704 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:52,742 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:52,743 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,744 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:52,747 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44764]
+[WARNING] 2026-03-02 07:39:52,748 [daphne.server] /home/x/jakija/.venv/lib/python3.10/site-packages/django/core/handlers/asgi.py:332: builtins.Warning: StreamingHttpResponse must consume synchronous iterators in order to serve them asynchronously. Use an asynchronous iterator instead.
+[DEBUG] 2026-03-02 07:39:52,748 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,749 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:52,749 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44764]
+[INFO] 2026-03-02 07:39:52,749 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:52 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:52,750 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:52,750 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44768]
+[INFO] 2026-03-02 07:39:52,750 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:52 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:52,750 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,751 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44774]
+[INFO] 2026-03-02 07:39:52,752 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:52 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:52,752 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:52,776 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,784 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,785 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,785 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44768]
+[INFO] 2026-03-02 07:39:52,785 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:52 +0000] "GET /media/profile_pics/3d-cute-halloween-grim-reaper-with-a-pumpkin-bucket-free-png.webp HTTP/1.1" 200 7164 "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:52,785 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,796 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,821 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:52,821 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44768]
+[INFO] 2026-03-02 07:39:52,821 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:52 +0000] "GET /popular_courses/ HTTP/1.1" 200 641 "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:52,822 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:55,144 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44764]
+[WARNING] 2026-03-02 07:39:55,158 [daphne.server] /home/x/jakija/./authentication/views.py:523: django.core.paginator.UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'courses.models.Course'> QuerySet.
+[DEBUG] 2026-03-02 07:39:55,178 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:55,178 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44764]
+[INFO] 2026-03-02 07:39:55,178 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:54 +0000] "GET /course_list/ HTTP/1.1" 200 30368 "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:55,179 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:55,209 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:55,210 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:55,210 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:55,214 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:55,214 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:55,214 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:55,215 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44768]
+[INFO] 2026-03-02 07:39:55,215 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:54 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:55,215 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:55,216 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44774]
+[INFO] 2026-03-02 07:39:55,216 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:54 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:55,216 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:55,217 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44764]
+[INFO] 2026-03-02 07:39:55,217 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:54 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:55,218 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,796 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,834 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,835 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44764]
+[INFO] 2026-03-02 07:39:57,835 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:57 +0000] "GET / HTTP/1.1" 200 39592 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:57,835 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,862 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:57,863 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:57,867 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,869 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:57,869 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:57,870 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44774]
+[INFO] 2026-03-02 07:39:57,870 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:57 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:57,871 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44774]
+[DEBUG] 2026-03-02 07:39:57,872 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44768]
+[INFO] 2026-03-02 07:39:57,872 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:57 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:57,872 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:57,875 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,877 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44764]
+[INFO] 2026-03-02 07:39:57,877 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:57 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:57,877 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44764]
+[DEBUG] 2026-03-02 07:39:57,928 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:57,947 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:39:57,947 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44768]
+[INFO] 2026-03-02 07:39:57,948 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:39:57 +0000] "GET /popular_courses/ HTTP/1.1" 200 641 "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:39:57,948 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44768]
+[DEBUG] 2026-03-02 07:40:19,390 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:19,417 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:19,417 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37516]
+[INFO] 2026-03-02 07:40:19,417 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:18 +0000] "GET / HTTP/1.1" 200 39592 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:19,417 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:19,464 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:19,467 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:19,467 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:19,471 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:19,472 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:19,473 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37516]
+[INFO] 2026-03-02 07:40:19,473 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:18 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:19,474 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:19,474 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:19,474 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37520]
+[INFO] 2026-03-02 07:40:19,475 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:18 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:19,475 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:19,476 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37526]
+[INFO] 2026-03-02 07:40:19,476 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:18 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:19,476 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:19,501 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:19,516 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:19,517 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37520]
+[INFO] 2026-03-02 07:40:19,517 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:18 +0000] "GET /popular_courses/ HTTP/1.1" 200 641 "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:19,517 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:25,224 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 59628]
+[WARNING] 2026-03-02 07:40:25,246 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:40:25,247 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:25,247 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:25,247 [daphne.http_protocol] HTTP close for ['127.0.0.1', 59628]
+[INFO] 2026-03-02 07:40:25,247 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:24 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:25,247 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:26,531 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:26,553 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:26,553 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37516]
+[INFO] 2026-03-02 07:40:26,554 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:25 +0000] "GET /course_list/ HTTP/1.1" 200 30368 "http://127.0.0.1:8000/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:26,554 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:26,591 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:26,593 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:26,595 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:26,596 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:26,597 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37520]
+[INFO] 2026-03-02 07:40:26,597 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:25 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:26,597 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:26,599 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37526]
+[INFO] 2026-03-02 07:40:26,599 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:25 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:26,599 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:26,604 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:26,605 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:26,606 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37520]
+[INFO] 2026-03-02 07:40:26,606 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:25 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:26,606 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:27,189 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 59628]
+[WARNING] 2026-03-02 07:40:27,211 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:40:27,212 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:27,212 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:27,212 [daphne.http_protocol] HTTP close for ['127.0.0.1', 59628]
+[INFO] 2026-03-02 07:40:27,212 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:26 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:27,213 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:28,361 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:28,404 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:28,404 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:28,404 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37516]
+[INFO] 2026-03-02 07:40:28,404 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:27 +0000] "GET /course-detail/2/public-speaking-for-beginners-speak-with-confidence/ HTTP/1.1" 200 76610 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:28,405 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37516]
+[DEBUG] 2026-03-02 07:40:28,441 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:28,441 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:28,445 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:28,446 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:28,446 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37520]
+[INFO] 2026-03-02 07:40:28,446 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:27 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:28,447 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:28,448 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37526]
+[INFO] 2026-03-02 07:40:28,448 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:27 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:28,448 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37526]
+[DEBUG] 2026-03-02 07:40:28,452 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:28,455 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:28,455 [daphne.http_protocol] HTTP close for ['127.0.0.1', 37520]
+[INFO] 2026-03-02 07:40:28,456 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:27 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:28,456 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 37520]
+[DEBUG] 2026-03-02 07:40:28,896 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 59628]
+[WARNING] 2026-03-02 07:40:28,919 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:40:28,919 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:28,920 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 59628]
+[DEBUG] 2026-03-02 07:40:28,920 [daphne.http_protocol] HTTP close for ['127.0.0.1', 59628]
+[INFO] 2026-03-02 07:40:28,920 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:40:28 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:40:28,920 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 59628]
+[INFO] 2026-03-02 07:41:28,406 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=37516)
+[INFO] 2026-03-02 07:41:28,449 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=37526)
+[INFO] 2026-03-02 07:41:28,456 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=37520)
+[INFO] 2026-03-02 07:41:28,921 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=59628)
+[DEBUG] 2026-03-02 07:41:47,753 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,789 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,789 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,789 [daphne.http_protocol] HTTP close for ['127.0.0.1', 34474]
+[INFO] 2026-03-02 07:41:47,789 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:41:47 +0000] "GET /course-detail/2/public-speaking-for-beginners-speak-with-confidence/ HTTP/1.1" 200 76610 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:41:47,789 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,821 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,823 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 34488]
+[DEBUG] 2026-03-02 07:41:47,827 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,828 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 34488]
+[DEBUG] 2026-03-02 07:41:47,828 [daphne.http_protocol] HTTP close for ['127.0.0.1', 34474]
+[INFO] 2026-03-02 07:41:47,829 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:41:47 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:41:47,829 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 34474]
+[DEBUG] 2026-03-02 07:41:47,829 [daphne.http_protocol] HTTP close for ['127.0.0.1', 34488]
+[INFO] 2026-03-02 07:41:47,830 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:41:47 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:41:47,830 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 34488]
+[DEBUG] 2026-03-02 07:41:47,840 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 34488]
+[DEBUG] 2026-03-02 07:41:47,841 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 34488]
+[DEBUG] 2026-03-02 07:41:47,842 [daphne.http_protocol] HTTP close for ['127.0.0.1', 34488]
+[INFO] 2026-03-02 07:41:47,842 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:41:47 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:41:47,842 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 34488]
+[DEBUG] 2026-03-02 07:41:48,305 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 34498]
+[WARNING] 2026-03-02 07:41:48,324 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:41:48,325 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 34498]
+[DEBUG] 2026-03-02 07:41:48,325 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 34498]
+[DEBUG] 2026-03-02 07:41:48,325 [daphne.http_protocol] HTTP close for ['127.0.0.1', 34498]
+[INFO] 2026-03-02 07:41:48,325 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:41:47 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:41:48,325 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 34498]
+[INFO] 2026-03-02 07:42:47,830 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=34474)
+[INFO] 2026-03-02 07:42:47,843 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=34488)
+[INFO] 2026-03-02 07:42:48,326 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=34498)
+[DEBUG] 2026-03-02 07:44:05,463 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 33212]
+[WARNING] 2026-03-02 07:44:05,484 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:44:05,485 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 33212]
+[DEBUG] 2026-03-02 07:44:05,485 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 33212]
+[DEBUG] 2026-03-02 07:44:05,485 [daphne.http_protocol] HTTP close for ['127.0.0.1', 33212]
+[INFO] 2026-03-02 07:44:05,485 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:44:04 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:44:05,486 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 33212]
+[INFO] 2026-03-02 07:45:05,486 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=33212)
+[DEBUG] 2026-03-02 07:45:16,230 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,264 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,264 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,264 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44176]
+[INFO] 2026-03-02 07:45:16,265 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:45:15 +0000] "GET /course-detail/2/public-speaking-for-beginners-speak-with-confidence/ HTTP/1.1" 200 76610 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:45:16,265 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,303 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,304 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44180]
+[DEBUG] 2026-03-02 07:45:16,306 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,307 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44180]
+[DEBUG] 2026-03-02 07:45:16,308 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44176]
+[INFO] 2026-03-02 07:45:16,308 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:45:15 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:45:16,309 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44176]
+[DEBUG] 2026-03-02 07:45:16,309 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44180]
+[INFO] 2026-03-02 07:45:16,309 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:45:15 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:45:16,309 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44180]
+[DEBUG] 2026-03-02 07:45:16,314 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44180]
+[DEBUG] 2026-03-02 07:45:16,316 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 44180]
+[DEBUG] 2026-03-02 07:45:16,316 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44180]
+[INFO] 2026-03-02 07:45:16,316 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:45:15 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:45:16,316 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44180]
+[DEBUG] 2026-03-02 07:45:16,839 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 44182]
+[WARNING] 2026-03-02 07:45:16,865 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:45:16,865 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 44182]
+[DEBUG] 2026-03-02 07:45:16,865 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 44182]
+[DEBUG] 2026-03-02 07:45:16,866 [daphne.http_protocol] HTTP close for ['127.0.0.1', 44182]
+[INFO] 2026-03-02 07:45:16,866 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:45:15 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:45:16,866 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 44182]
+[INFO] 2026-03-02 07:45:55,669 [daphne.server] Received SIGINT, shutting down.
+[INFO] 2026-03-02 07:45:55,670 [daphne.server] Killed 0 pending application instances
+[INFO] 2026-03-02 07:45:55,671 [daphne.server] (TCP Port 8000 Closed)
+[INFO] 2026-03-02 07:45:55,672 [daphne.server] Stopping factory <daphne.http_protocol.HTTPFactory object at 0x7622e0708ac0>
+[INFO] 2026-03-02 07:45:58,874 [axes.apps] AXES: BEGIN version 8.0.0, blocking by username or ip_address
+[INFO] 2026-03-02 07:45:58,878 [daphne.cli] Starting server at tcp:port=8000:interface=127.0.0.1
+[INFO] 2026-03-02 07:45:58,879 [daphne.server] HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+[INFO] 2026-03-02 07:45:58,879 [daphne.server] Configuring endpoint tcp:port=8000:interface=127.0.0.1
+[INFO] 2026-03-02 07:45:58,879 [daphne.server] HTTPFactory starting on 8000
+[INFO] 2026-03-02 07:45:58,879 [daphne.server] Starting factory <daphne.http_protocol.HTTPFactory object at 0x7e703b018a90>
+[INFO] 2026-03-02 07:45:58,879 [daphne.server] Listening on TCP address 127.0.0.1:8000
+[DEBUG] 2026-03-02 07:46:14,911 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:15,590 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:15,590 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:15,590 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:15,590 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:14 +0000] "GET /course-detail/2/public-speaking-for-beginners-speak-with-confidence/ HTTP/1.1" 200 76610 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:15,591 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:15,632 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:15,635 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:15,638 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[WARNING] 2026-03-02 07:46:15,639 [daphne.server] /home/x/jakija/.venv/lib/python3.10/site-packages/django/core/handlers/asgi.py:332: builtins.Warning: StreamingHttpResponse must consume synchronous iterators in order to serve them asynchronously. Use an asynchronous iterator instead.
+[DEBUG] 2026-03-02 07:46:15,641 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:15,642 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:15,643 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:14 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:15,643 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:15,644 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:15,644 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:14 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:15,645 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:15,653 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:15,655 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:15,655 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:15,656 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:14 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:15,656 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:16,113 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56722]
+[WARNING] 2026-03-02 07:46:16,141 [django.request] Not Found: /static/css/ckeditor5.css.map
+[DEBUG] 2026-03-02 07:46:16,141 [daphne.http_protocol] HTTP 404 response started for ['127.0.0.1', 56722]
+[DEBUG] 2026-03-02 07:46:16,142 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 56722]
+[DEBUG] 2026-03-02 07:46:16,142 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56722]
+[INFO] 2026-03-02 07:46:16,142 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:15 +0000] "GET /static/css/ckeditor5.css.map HTTP/1.1" 404 83609 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:16,142 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56722]
+[DEBUG] 2026-03-02 07:46:44,939 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[WARNING] 2026-03-02 07:46:44,953 [daphne.server] /home/x/jakija/./authentication/views.py:523: django.core.paginator.UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'courses.models.Course'> QuerySet.
+[DEBUG] 2026-03-02 07:46:44,977 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:44,977 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:44,978 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:44 +0000] "GET /course_list/ HTTP/1.1" 200 30368 "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:44,978 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:45,006 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:45,007 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:45,011 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:45,016 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:45,017 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:45,017 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:45,018 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:45,019 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:44 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:45,019 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:45,019 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:45,019 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:44 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:45,019 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:45,020 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:45,020 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:44 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:45,020 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:45,042 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:45,042 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:45,052 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:45,052 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:45,053 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:44 +0000] "GET /media/logos/logo.webp HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:45,053 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:45,053 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:45,053 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:45,053 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:44 +0000] "GET /media/courses/ChatGPT_Image_Jan_12_2026_09_14_52_AM.png HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:45,053 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:48,273 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:48,318 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:48,319 [daphne.http_protocol] HTTP response chunk for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:48,319 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:48,319 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:47 +0000] "GET /course-detail/2/public-speaking-for-beginners-speak-with-confidence/ HTTP/1.1" 200 76610 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:48,319 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:48,343 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:48,344 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:48,348 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:48,349 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:48,350 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:48,350 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:47 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:48,351 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:48,353 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:48,353 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:47 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:48,354 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:48,355 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:48,361 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:48,362 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:48,362 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:47 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:48,362 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:52,319 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:52,345 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:52,346 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:52,346 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:51 +0000] "GET /blog/ HTTP/1.1" 200 24256 "http://127.0.0.1:8000/course-detail/2/public-speaking-for-beginners-speak-with-confidence/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:52,346 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:52,368 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:52,369 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:52,372 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:52,374 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:52,375 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:52,375 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:52,376 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:51 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/blog/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:52,376 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:52,377 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:52,377 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:51 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/blog/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:52,377 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:52,378 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:52,380 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:52,380 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:51 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/blog/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:52,380 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:52,407 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:52,413 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:52,414 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:52,414 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:51 +0000] "GET /media/blog_images/ImageForArticle_22647_16545264138148394.webp HTTP/1.1" 304 - "http://127.0.0.1:8000/blog/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:52,414 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:53,642 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:53,657 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:53,657 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:53,657 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:52 +0000] "GET /about/ HTTP/1.1" 200 24723 "http://127.0.0.1:8000/blog/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:53,657 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:53,683 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:53,685 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:53,687 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:53,690 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:53,691 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:53,692 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:53,692 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:53,692 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:52 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:53,692 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:53,693 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:53,693 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:52 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:53,693 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:53,694 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:53,695 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:52 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:53,695 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:54,584 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:54,609 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:54,610 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:54,610 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:53 +0000] "GET /org-partner/ HTTP/1.1" 200 20150 "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:54,610 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:54,628 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:54,631 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:54,631 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:54,632 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:53 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:54,632 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:54,633 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:54,636 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:54,638 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:54,642 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:54,642 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:53 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:54,642 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:54,645 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:54,646 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:54,646 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:53 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:54,646 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:56,702 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:56,725 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:56,725 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:56,725 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:55 +0000] "GET /org-partner/universitas/ HTTP/1.1" 200 36792 "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:56,725 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:56,749 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:56,750 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:56,752 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:56,756 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:56,758 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:56,759 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:46:56,759 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:46:56,760 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:55 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:56,760 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:46:56,761 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:46:56,762 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:55 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:56,762 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:46:56,763 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:46:56,763 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:46:55 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:46:56,764 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:05,583 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:05,608 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:05,609 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:05,609 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:04 +0000] "GET /org-partner/universitas/?category=Comunication HTTP/1.1" 200 36826 "http://127.0.0.1:8000/org-partner/universitas/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:05,609 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:05,636 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:05,636 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:05,638 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:05,639 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:05,639 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:05,642 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:47:05,642 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:04 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/?category=Comunication" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:05,643 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:05,643 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:47:05,643 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:04 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/?category=Comunication" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:05,644 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:05,647 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:05,648 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:05,648 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:04 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/?category=Comunication" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:05,648 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:07,095 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:07,128 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:07,128 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:07,129 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:06 +0000] "GET /org-partner/universitas/?category= HTTP/1.1" 200 36802 "http://127.0.0.1:8000/org-partner/universitas/?category=Comunication" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:07,129 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:07,150 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:07,151 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:07,153 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:07,154 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:07,155 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:07,157 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:47:07,157 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:06 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/?category=" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:07,157 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:07,158 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:47:07,160 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:06 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/?category=" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:07,160 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:07,162 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:07,163 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:07,164 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:06 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/universitas/?category=" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:07,164 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:09,146 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:09,166 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:09,167 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:09,167 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:08 +0000] "GET /course_list/ HTTP/1.1" 200 30368 "http://127.0.0.1:8000/org-partner/universitas/?category=" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:09,167 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:09,183 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:09,184 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:09,186 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:09,190 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:09,192 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:09,193 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:09,195 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:47:09,195 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:08 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:09,195 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:09,196 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:47:09,196 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:08 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:09,196 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:09,197 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:09,197 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:08 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:09,197 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:10,510 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:10,517 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:10,518 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:10,518 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:09 +0000] "GET /about/ HTTP/1.1" 200 24723 "http://127.0.0.1:8000/course_list/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:10,518 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:10,531 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:10,532 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:10,535 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:10,536 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:10,536 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:47:10,537 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:09 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:10,537 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:10,538 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:47:10,538 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:09 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:10,538 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:10,539 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:10,541 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:10,542 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:47:10,542 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:09 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:10,543 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:11,584 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:11,609 [daphne.http_protocol] HTTP 200 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:11,610 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:11,610 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:10 +0000] "GET /org-partner/ HTTP/1.1" 200 20150 "http://127.0.0.1:8000/about/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:11,610 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:11,629 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:11,630 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:11,633 [daphne.http_protocol] HTTP b'GET' request for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:11,637 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:11,637 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:11,638 [daphne.http_protocol] HTTP close for ['127.0.0.1', 49714]
+[INFO] 2026-03-02 07:47:11,638 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:10 +0000] "GET /static/css/output.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:11,639 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 49714]
+[DEBUG] 2026-03-02 07:47:11,643 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56720]
+[INFO] 2026-03-02 07:47:11,644 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:10 +0000] "GET /static/css/ckeditor5.css HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:11,644 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56720]
+[DEBUG] 2026-03-02 07:47:11,645 [daphne.http_protocol] HTTP 304 response started for ['127.0.0.1', 56706]
+[DEBUG] 2026-03-02 07:47:11,645 [daphne.http_protocol] HTTP close for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:11,645 [daphne.server] "127.0.0.1" - - [02/Mar/2026:00:47:10 +0000] "GET /static/js/main.js?v=1 HTTP/1.1" 304 - "http://127.0.0.1:8000/org-partner/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0"
+[DEBUG] 2026-03-02 07:47:11,646 [daphne.http_protocol] HTTP response complete for ['127.0.0.1', 56706]
+[INFO] 2026-03-02 07:47:16,143 [daphne.server] Timing out client: IPv4Address(type='TCP', host='127.0.0.1', port=56722)

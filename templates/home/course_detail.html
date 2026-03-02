@@ -750,7 +750,7 @@
                                 {% if course.link_video %}
                                     <a href="{{ course.link_video }}" class="block" data-fancybox="video-gallery">
                                         {% if course.image %}
-                                            <img src="{{ course.image.url }}" alt="{{ course.name }} Image" class="w-full h-40 object-cover rounded-xl hover:scale-105 transition-transform">
+                                            <img src="{{ course.image.url }}" alt="{{ course.name }} Image" class="w-full h-50 object-cover rounded-xl hover:scale-105 transition-transform">
                                         {% else %}
                                             <img src="{% static 'assets/img/user/logo.5272a797c07c.png' %}" alt="Default Image" class="w-full h-52 object-cover rounded-xl hover:scale-105 transition-transform">
                                         {% endif %}

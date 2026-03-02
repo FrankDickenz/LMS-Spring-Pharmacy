@@ -1097,17 +1097,17 @@ def reply_comment(request, comment_id):
                 actor=request.user,
                 notif_type='reply_comment',
                 priority='medium',
-                title=f"Balasan pada komentar Anda di {parent_comment.material.title}",
-                message=(
-                    f"{request.user.username} membalas komentar Anda "
-                    f"pada '{parent_comment.material.title}' "
-                    f"di {course_name}."
+                title = f"New reply to your comment",
+
+                message = (
+                    f"{request.user.username} replied to your comment "
+                    f"on '{parent_comment.material.title}' "
+                    f"in the course '{course_name}'."
                 ),
                 link=link
             )
             
-            print("Notifikasi BERHASIL dibuat")
-            print(f"  → Link: {link}")
+            
         
         except AttributeError as attr_err:
             print("AttributeError saat membangun link notifikasi:", str(attr_err))
@@ -1126,8 +1126,11 @@ def reply_comment(request, comment_id):
                     actor=request.user,
                     notif_type='reply_comment',
                     priority='medium',
-                    title=f"Balasan pada komentar Anda di {parent_comment.material.title}",
-                    message=f"{request.user.username} membalas komentar Anda.",
+                    title = f"New reply to your comment on {parent_comment.material.title}",
+                    message = (
+                        f"{request.user.username} replied to your comment "
+                        f"on '{parent_comment.material.title}'."
+                    ),
                     link=fallback_link
                 )
                 print("Notifikasi dibuat dengan FALLBACK link:", fallback_link)
