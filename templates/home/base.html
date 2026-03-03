@@ -161,9 +161,9 @@
                             flex items-center gap-2 shadow-sm hover:shadow-md">
 
                       <!-- Icon User Dynamic -->
-                      {% if request.user.profile.gender == "female" %}
+                      {% if request.user.gender == "female" %}
                           <i class="fa-solid fa-user text-pink-500"></i>
-                      {% elif request.user.profile.gender == "male" %}
+                      {% elif request.user.gender == "male" %}
                           <i class="fa-solid fa-user text-blue-500"></i>
                       {% else %}
                           <i class="fa-solid fa-user text-gray-500"></i>
