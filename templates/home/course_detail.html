@@ -582,10 +582,10 @@
 
                 <!-- Comments -->
               <!-- Comments Section -->
-                <div class="mt-6 space-y-4">
+                <div class="mt-6 space-y-4" >
                     {% for comment in comments %}
                         <!-- Komentar Utama -->
-                        <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-200 flex gap-4 items-start">
+                        <div id="comment-{{ comment.id }}" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-200 flex gap-4 items-start">
                             <!-- Foto User -->
                             <img src="{{ comment.user.photo.url }}" alt="{{ comment.user.username }}"
                                 class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"

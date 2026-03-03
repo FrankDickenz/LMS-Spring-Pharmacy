@@ -22,6 +22,7 @@ from django.template.loader import get_template
 from .utils import generate_oauth_signature  # pastikan ada util ini
 from datetime import date
 from django.db import transaction
+from django.contrib.contenttypes.models import ContentType
 # Third-party packages
 from datetime import timedelta
 import pytz
@@ -3447,6 +3448,22 @@ def add_comment_course(request, course_id):
             comment.full_clean()  # Validasi model Django
             comment.save()
             messages.success(request, "Comment posted successfully!")
+            # Ambil user partner pemilik course
+            partner_user = course.org_partner.user
+
+            # Hindari self-notification
+            if partner_user and partner_user != request.user:
+                Notification.objects.create(
+                    user=partner_user,
+                    actor=request.user,
+                    notif_type='new_course_comment',
+                    priority='medium',
+                    title="New comment on your course",
+                    message=f"{request.user.username} commented on your course '{course.course_name}'.",
+                    link=f'/course-detail/{course.id}/{course.slug}/#comment-{comment.id}',
+                    content_type=ContentType.objects.get_for_model(comment),
+                    object_id=comment.id
+                )
         except ValidationError as e:
             messages.error(request, f"Error posting comment: {e}")
             return redirect('courses:course_lms_detail', id=course.id, slug=course.slug)

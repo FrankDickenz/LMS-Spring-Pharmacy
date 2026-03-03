@@ -22,6 +22,7 @@ class Notification(models.Model):
         ('instructor_announcement', 'Pengumuman dari Pengajar'),
         ('new_review', 'Review Baru pada Course-mu'),
         ('submission_received', 'Submission Reviewed'),
+        ('new_course_comment', 'New Course Comment'),
         
     )
 
