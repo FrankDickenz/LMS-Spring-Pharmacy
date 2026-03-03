@@ -79,13 +79,26 @@
     <div class="relative flex items-center justify-between px-6 py-4">
 
         <!-- Logo / Admin Panel -->
-        <div class="flex items-center space-x-3">
-            <label for="sidebar-toggle" class="cursor-pointer md:hidden text-red-400">
+        <div class="flex items-center space-x-3 group">
+
+            <label for="sidebar-toggle" class="cursor-pointer md:hidden text-red-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"/>
                 </svg>
             </label>
-            <h1 class="text-2xl font-bold text-red-400">Admin<span class="text-gray-800">Panel</span></h1>
+
+            <div class="flex items-center gap-2 transition-all duration-300 group-hover:scale-105">
+                <div class="w-9 h-9 flex items-center justify-center 
+                            bg-gradient-to-r from-red-600 to-red-400 
+                            text-white rounded-xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+
+                <h1 class="text-2xl font-bold tracking-wide text-gray-800">
+                    Jak<span class="text-red-500">Ija</span>
+                </h1>
+            </div>
+
         </div>
 
         <!-- Messages di tengah header -->
