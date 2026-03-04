@@ -5,461 +5,826 @@
 <meta name="csrf-token" content="{{ csrf_token }}">
 {% include "courses/course_set.html" %}
 
-<!-- FULL WIDTH CARD -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Course Outline</h1>
+<style>
+  :root {
+    --studio-bg: #f7f8f9;
+    --studio-header: #1a2a3a;
+    --studio-blue: #0075b4;
+    --studio-blue-light: #e8f4fb;
+    --studio-green: #137a4a;
+    --studio-green-light: #e8f5ee;
+    --studio-purple: #6b3fa0;
+    --studio-purple-light: #f0eaf8;
+    --studio-orange: #c85417;
+    --studio-border: #d3d9e0;
+    --studio-text: #1d2738;
+    --studio-text-muted: #5c6876;
+    --studio-section-bar: #2196a4;
+    --studio-subsection-bar: #14734a;
+    --studio-unit-bar: #7649b5;
+    --shadow-card: 0 1px 4px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.08);
+    --radius: 5px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--studio-bg); color: var(--studio-text); }
+
+
+
+  /* ── Page Layout ── */
+ .studio-page {
+  width: 100%;
+  margin: 0;
+  padding: 28px 0 60px;
+}
+
+  /* ── Page Header ── */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .page-header h1 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--studio-text);
+    margin: 0;
+  }
+  .page-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13.5px; font-weight: 600;
+    padding: 7px 16px; border-radius: var(--radius);
+    border: 1px solid transparent; cursor: pointer;
+    transition: all .15s; text-decoration: none; white-space: nowrap;
+  }
+  .btn-primary { background: var(--studio-blue); color: #fff; border-color: var(--studio-blue); }
+  .btn-primary:hover { background: #005e92; border-color: #005e92; }
+  .btn-secondary { background: #fff; color: var(--studio-text); border-color: var(--studio-border); }
+  .btn-secondary:hover { background: #eef1f4; }
+  .btn-ghost { background: transparent; color: var(--studio-text-muted); border-color: transparent; padding: 5px 10px; }
+  .btn-ghost:hover { background: #eef1f4; color: var(--studio-text); }
+  .btn-danger { background: #fff; color: #c0392b; border-color: #e8c4c0; }
+  .btn-danger:hover { background: #fdf0ef; border-color: #c0392b; }
+  .btn-sm { font-size: 12px; padding: 5px 12px; }
+  .btn-xs { font-size: 11.5px; padding: 4px 10px; }
+
+  /* ── Inline Action Link ── */
+  .action-link { background: none; border: none; cursor: pointer; font-size: 12.5px; font-weight: 600; font-family: inherit; padding: 0; }
+  .action-link.edit { color: var(--studio-blue); }
+  .action-link.edit:hover { text-decoration: underline; }
+  .action-link.delete { color: #c0392b; }
+  .action-link.delete:hover { text-decoration: underline; }
+  .action-link.live { color: var(--studio-green); }
+  .action-link.live:hover { text-decoration: underline; }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center; padding: 56px 24px;
+    background: #fff; border: 2px dashed var(--studio-border);
+    border-radius: var(--radius); color: var(--studio-text-muted);
+  }
+  .empty-state i { font-size: 40px; color: #bdc5ce; margin-bottom: 12px; display: block; }
+  .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--studio-text); margin: 0 0 6px; }
+  .empty-state p { font-size: 13.5px; margin: 0 0 18px; }
+
+  /* ─────────────────────────────────────────
+     SECTION CARD
+  ───────────────────────────────────────── */
+  .section-card {
+    background: #fff;
+    border: 1px solid var(--studio-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: box-shadow .15s;
+  }
+  .section-card:hover { box-shadow: var(--shadow-hover); }
+
+  .section-header {
+    display: flex; align-items: center;
+    padding: 0;
+    background: #fff;
+    border-left: 5px solid var(--studio-section-bar);
+    min-height: 52px;
+  }
+  .section-header .drag-handle {
+    cursor: grab; padding: 14px 10px 14px 14px; color: #b0bcc8; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .section-header .drag-handle:active { cursor: grabbing; }
+  .section-header .toggle-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--studio-text-muted); padding: 14px 6px;
+    font-size: 11px; flex-shrink: 0; transition: transform .2s;
+  }
+  .section-header .toggle-btn.open { transform: rotate(90deg); }
+
+  .section-header .header-label {
+    flex: 1; min-width: 0; padding: 12px 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-header .label-text {
+    font-size: 15px; font-weight: 700; color: var(--studio-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .level-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
+  }
+  
+  .label-text.section { background: #d9eff7; color: #0e6a99;}
+  
+  .level-text.subsection { background: #d5efdf; color: #116b3e; }
+  .level-tag.unit { background: #ede4f7; color: #5e3890; }
+
+  .section-header .header-actions {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 14px; flex-shrink: 0; flex-wrap: wrap;
+  }
+
+  /* Inline edit input on header */
+  .inline-edit-input {
+    display: none; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--studio-blue);
+    border-radius: 3px; padding: 4px 8px;
+    outline: none; width: 300px; max-width: 100%;
+    font-family: inherit;
+    box-shadow: 0 0 0 3px rgba(0,117,180,.15);
+  }
+
+  /* ── Section Body ── */
+  .section-body { padding: 10px 14px 14px 20px; background: #f9fafb; }
+  .section-body.collapsed { display: none; }
+
+  /* ─────────────────────────────────────────
+     SUBSECTION CARD
+  ───────────────────────────────────────── */
+  .subsection-card {
+    background: #fff;
+    border: 1px solid var(--studio-border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .subsection-header {
+    display: flex; align-items: center;
+    border-left: 4px solid var(--studio-subsection-bar);
+    min-height: 44px; background: #fff;
+  }
+  .subsection-header .drag-handle { padding: 10px 8px 10px 10px; color: #b0bcc8; cursor: grab; font-size: 13px; flex-shrink: 0; }
+  .subsection-header .toggle-btn { background: none; border: none; cursor: pointer; color: var(--studio-text-muted); padding: 10px 5px; font-size: 10px; flex-shrink: 0; transition: transform .2s; }
+  .subsection-header .toggle-btn.open { transform: rotate(90deg); }
+  .subsection-header .header-label { flex: 1; min-width: 0; padding: 10px 6px; display: flex; align-items: center; gap: 7px; }
+  .subsection-header .label-text { font-size: 14px; font-weight: 600; color: var(--studio-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .subsection-header .header-actions { display: flex; align-items: center; gap: 4px; padding: 6px 12px; flex-shrink: 0; flex-wrap: wrap; }
+
+  /* ── Subsection Body ── */
+  .subsection-body { padding: 8px 12px 12px 16px; background: #fcfcfd; }
+  .subsection-body.collapsed { display: none; }
+
+  /* ─────────────────────────────────────────
+     UNIT CARD
+  ───────────────────────────────────────── */
+  .unit-card {
+    background: #fff;
+    border: 1px solid var(--studio-border);
+    border-left: 3px solid var(--studio-unit-bar);
+    border-radius: var(--radius);
+    margin-bottom: 7px;
+    padding: 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  }
+  .unit-header {
+    display: flex; align-items: center;
+    padding: 8px 12px 8px 10px;
+    gap: 6px;
+    background: #fff;
+    border-bottom: 1px solid #eef0f3;
+  }
+  .unit-header .drag-handle { color: #c8d0d9; cursor: grab; font-size: 12px; flex-shrink: 0; }
+  .unit-header .unit-title { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--studio-text); display: flex; align-items: center; gap: 6px; }
+  .unit-header .unit-title .inline-edit-input { font-size: 13px; font-weight: 600; width: 260px; }
+  .unit-header .unit-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+  /* ── Unit Content ── */
+  .unit-content { padding: 10px 14px 12px; }
+
+  /* Materials & Assessments list */
+  .content-block { margin-bottom: 10px; }
+  .content-block-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px; color: var(--studio-text-muted);
+    margin-bottom: 5px; padding-bottom: 4px;
+    border-bottom: 1px solid #eef0f3;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .xblock-row {
+    display: flex; align-items: center;
+    padding: 7px 10px;
+    background: #f9fafb; border: 1px solid #eef0f3;
+    border-radius: 4px; margin-bottom: 4px;
+    gap: 8px; transition: background .12s;
+  }
+  .xblock-row:hover { background: #f0f4f8; }
+  .xblock-row .xblock-icon { font-size: 13px; flex-shrink: 0; }
+  .xblock-row .xblock-icon.material { color: var(--studio-green); }
+  .xblock-row .xblock-icon.assessment { color: var(--studio-purple); }
+  .xblock-row .xblock-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--studio-text); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .xblock-row .weight-badge { font-size: 11px; font-weight: 700; background: var(--studio-purple-light); color: var(--studio-purple); padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
+  .xblock-row .xblock-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  /* ── Add buttons row ── */
+  .add-content-row {
+    display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .btn-add-material {
+    flex: 1; min-width: 120px;
+    font-size: 12.5px; font-weight: 600;
+    padding: 7px 12px; border-radius: var(--radius);
+    border: 1px dashed #57a87a; color: var(--studio-green);
+    background: var(--studio-green-light); cursor: pointer;
+    transition: all .14s; display: flex; align-items: center; justify-content: center; gap: 5px;
+    font-family: inherit;
+  }
+  .btn-add-material:hover { background: #cde9da; border-style: solid; }
+  .btn-add-assessment {
+    flex: 1; min-width: 120px;
+    font-size: 12.5px; font-weight: 600;
+    padding: 7px 12px; border-radius: var(--radius);
+    border: 1px dashed #9b72cc; color: var(--studio-purple);
+    background: var(--studio-purple-light); cursor: pointer;
+    transition: all .14s; display: flex; align-items: center; justify-content: center; gap: 5px;
+    font-family: inherit;
+  }
+  .btn-add-assessment:hover { background: #e0d4f5; border-style: solid; }
+
+  /* ── Add new section/subsection/unit row ── */
+  .add-row {
+    margin-top: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .add-row::before, .add-row::after {
+    content: ''; flex: 1; height: 1px; background: var(--studio-border);
+  }
+
+  /* ─────────────────────────────────────────
+     MODAL
+  ───────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,20,35,.55);
+    backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px; overflow-y: auto;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: #fff; border-radius: 7px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3), 0 0 0 1px rgba(0,0,0,.1);
+    display: flex; flex-direction: column;
+    width: 100%; max-height: 92vh; overflow: hidden;
+    animation: modalIn .18s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform: translateY(12px) scale(.97); } to { opacity:1; transform: none; } }
+  .modal-box.w-md { max-width: 500px; }
+  .modal-box.w-lg { max-width: 700px; }
+  .modal-box.w-xl { max-width: 960px; }
+
+  .modal-head {
+    padding: 18px 24px 16px;
+    border-bottom: 1px solid var(--studio-border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff;
+  }
+  .modal-head h3 { font-size: 17px; font-weight: 700; margin: 0; color: var(--studio-text); }
+  .modal-close { background: none; border: none; cursor: pointer; font-size: 22px; color: #8a9ab0; line-height: 1; padding: 2px 6px; border-radius: 4px; }
+  .modal-close:hover { background: #eef1f4; color: var(--studio-text); }
+
+  .modal-body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+  .modal-foot {
+    padding: 14px 24px;
+    border-top: 1px solid var(--studio-border);
+    background: #f7f8f9;
+    display: flex; justify-content: flex-end; gap: 8px;
+  }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--studio-text); margin-bottom: 6px; }
+  .form-input {
+    width: 100%; padding: 9px 13px;
+    border: 1px solid var(--studio-border); border-radius: var(--radius);
+    font-size: 14px; font-family: inherit; color: var(--studio-text);
+    outline: none; transition: border .15s, box-shadow .15s;
+  }
+  .form-input:focus { border-color: var(--studio-blue); box-shadow: 0 0 0 3px rgba(0,117,180,.12); }
+
+  /* ── Toast ── */
+  #toast-container {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    pointer-events: none;
+  }
+  .toast-msg {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 6px;
+    font-size: 13.5px; font-weight: 600; font-family: inherit;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    animation: toastIn .25s ease, toastOut .3s ease 2.2s forwards;
+  }
+  .toast-msg.success { background: #1a6e3c; color: #fff; }
+  .toast-msg.error { background: #b92b2b; color: #fff; }
+  @keyframes toastIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+  @keyframes toastOut { to { opacity:0; transform: translateY(8px); } }
+
+  /* ── SortableJS ghost ── */
+  .sortable-ghost { opacity: .45; background: #e8f4fb !important; border-color: var(--studio-blue) !important; }
+  .sortable-chosen { box-shadow: 0 6px 20px rgba(0,0,0,.18) !important; transform: rotate(.5deg); }
+
+  .ck-editor__editable { min-height: 380px !important; }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
     
-    <!-- Tombol Actions -->
-    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+    .studio-page { padding: 18px 10px 48px; }
+    .section-header .header-actions,
+    .subsection-header .header-actions { flex-wrap: wrap; }
+    .inline-edit-input { width: 180px; }
+  }
+</style>
 
-    <button id="save-json" title="Save Order all changes made to the course outline"
-            class="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium shadow-sm transition">
-        Save Order
-    </button>
 
-    <button id="add-section" title="Add New Section"
-            class="flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium shadow-sm transition">
-        Add Section
-    </button>
 
+<div class="studio-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Course Outline</h1>
+    <div class="actions">
+      <button id="save-json" class="btn btn-secondary">
+        <i class="fas fa-save"></i> Save Order
+      </button>
+      <button id="add-section" class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Section
+      </button>
     </div>
+  </div>
+
+  <!-- SECTIONS CONTAINER -->
+  <div id="sections"></div>
+
+  <!-- EMPTY STATE (shown via JS) -->
+  <div id="empty-state" class="empty-state hidden">
+    <i class="fas fa-layer-group"></i>
+    <h3>No Sections Yet</h3>
+    <p>Start building your course by adding the first section.</p>
+    <button id="empty-add-section" class="btn btn-primary"><i class="fas fa-plus"></i> Add First Section</button>
+  </div>
 
 </div>
-<div id="sections" class="space-y-5"></div>
 
-</div>
-
-
-
-
-<!-- MODAL -->
-<div id="modal" class="fixed inset-0 hidden bg-black bg-opacity-60 flex items-start justify-center z-50 p-4 overflow-y-auto">
-    <div class="bg-white w-full h-full rounded-none shadow-2xl flex flex-col my-0">
-        <!-- Header -->
-        <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10">
-            <h3 id="modal-title" class="text-xl font-semibold text-gray-900">Add Material</h3>
-            <button id="cancel-modal" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-        </div>
-
-        <!-- Content -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                <input id="input-title" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-base">
-            </div>
-            <div id="ckeditor-wrapper" class="hidden">
-                <label class="block text-sm font-medium text-gray-700 mb-3">Description</label>
-                {{ form.description }}
-            </div>
-            <div id="weight-wrapper" class="hidden">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Weight (%)</label>
-                <input id="input-weight" type="number" step="0.01" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none text-base">
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="p-6 border-t bg-gray-50 flex flex-col sm:flex-row-reverse gap-3 sticky bottom-0 bg-gray-50 z-10">
-            <button id="save-modal" class="w-full sm:w-auto px-8 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition">Save</button>
-            <button id="cancel-modal" class="w-full sm:w-auto px-8 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition">Cancel</button>
-        </div>
+<!-- ═══════════════════════ MODAL ═══════════════════════ -->
+<div id="modal" class="modal-overlay hidden">
+  <div id="modal-content" class="modal-box w-md">
+    <div class="modal-head">
+      <h3 id="modal-title">Add Item</h3>
+      <button class="modal-close cancel-modal">&times;</button>
     </div>
-    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="input-title">Title <span style="color:#c0392b">*</span></label>
+        <input id="input-title" type="text" class="form-input" placeholder="Enter title…">
+      </div>
+      <div id="ckeditor-wrapper" class="form-group hidden">
+        <label>Description</label>
+        {{ form.description }}
+      </div>
+      <div id="weight-wrapper" class="form-group hidden">
+        <label for="input-weight">Weight (%)</label>
+        <input id="input-weight" type="number" step="0.01" min="0" max="100" class="form-input" placeholder="e.g. 25">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary cancel-modal">Cancel</button>
+      <button id="save-modal" class="btn btn-primary">Save</button>
+    </div>
+  </div>
 </div>
 
+<!-- Toast container -->
+<div id="toast-container"></div>
 
-
-
-
-<!-- Sortable -->
+<!-- SortableJS -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    const courseId = {{ course.id|safe }};
+    const courseId  = {{ course.id|safe }};
     const currentUser = "{{ user.username|escapejs }}";
-    const courseSlug = "{{ course.slug }}";
+    const courseSlug  = "{{ course.slug }}";
 
     const API = {
-        sections: '/sections/',
-        materials: '/materials/',
+        sections:    '/sections/',
+        materials:   '/materials/',
         assessments: '/assessments/',
-        reorder: '/sections/reorder/'
+        reorder:     '/sections/reorder/'
     };
 
     let currentAction = null, currentTarget = null, currentEditId = null;
 
-    // ====================== TOAST ======================
-    // ====================== TOAST ======================
-    const toastContainer = document.createElement('div');
-    toastContainer.id = 'toast';
-    toastContainer.className = 'fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4 px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 z-[9999]';
-    document.body.appendChild(toastContainer);
-
-    function showToast(message, type='success') {
-        toastContainer.textContent = message;
-
-        // hapus kelas warna sebelumnya
-        toastContainer.classList.remove('bg-green-600', 'bg-red-600', 'text-white');
-
-        // tambahkan warna sesuai tipe
-        toastContainer.classList.add(type === 'success' ? 'bg-green-600' : 'bg-red-600', 'text-white');
-
-        // tampilkan toast
-        toastContainer.classList.add('opacity-100');
-
-        // sembunyikan setelah 2.5 detik
-        setTimeout(() => {
-            toastContainer.classList.remove('opacity-100');
-        }, 2500);
+    // ══════════════════ TOAST ══════════════════
+    function showToast(msg, type = 'success') {
+        const el = document.createElement('div');
+        el.className = `toast-msg ${type}`;
+        el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+        document.getElementById('toast-container').appendChild(el);
+        setTimeout(() => el.remove(), 2600);
     }
 
-
-
-    // ====================== MODAL ======================
-    function openModal(action, target=null, editId=null, data={}) {
+    // ══════════════════ MODAL ══════════════════
+    function openModal(action, target = null, editId = null, data = {}) {
         currentAction = action; currentTarget = target; currentEditId = editId;
-        document.getElementById('input-title').value = data.title || data.name || '';
+
+        document.getElementById('input-title').value  = data.title || data.name || '';
         document.getElementById('input-weight').value = data.weight || '';
-        document.getElementById('ckeditor-wrapper').classList.toggle('hidden', action!=='material');
-        document.getElementById('weight-wrapper').classList.toggle('hidden', action!=='assessment');
 
-        document.getElementById('modal-title').textContent = editId
-            ? `Update ${action.charAt(0).toUpperCase() + action.slice(1)}`
-            : `Add ${action === 'unit' ? 'Unit' : action.charAt(0).toUpperCase() + action.slice(1)}`;
+        const isMaterial   = action === 'material';
+        const isAssessment = action === 'assessment';
+        document.getElementById('ckeditor-wrapper').classList.toggle('hidden', !isMaterial);
+        document.getElementById('weight-wrapper').classList.toggle('hidden', !isAssessment);
 
-        if(action==='material' && data.description){
-            setTimeout(()=>{
-                const editor = document.querySelector('.ck-editor__editable');
-                if(editor && editor.ckeditorInstance) editor.ckeditorInstance.setData(data.description);
-            },500);
+        const labelMap = { section:'Section', subsection:'Subsection', unit:'Unit', material:'Material', assessment:'Assessment' };
+        document.getElementById('modal-title').textContent = (editId ? 'Edit ' : 'New ') + (labelMap[action] || action);
+
+        const box = document.getElementById('modal-content');
+        box.classList.remove('w-md','w-lg','w-xl');
+        box.classList.add(isMaterial ? 'w-xl' : isAssessment ? 'w-lg' : 'w-md');
+
+        if (isMaterial && data.description) {
+            setTimeout(() => {
+                const ed = document.querySelector('.ck-editor__editable');
+                if (ed?.ckeditorInstance) ed.ckeditorInstance.setData(data.description);
+            }, 400);
         }
 
         document.getElementById('modal').classList.remove('hidden');
-        document.getElementById('input-title').focus();
+        setTimeout(() => document.getElementById('input-title').focus(), 80);
     }
 
-    function closeModal() {
-        document.getElementById('modal').classList.add('hidden');
-    }
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
-    document.getElementById('modal').addEventListener('click', e => e.target.id==='modal' && closeModal());
-    document.querySelectorAll('#cancel-modal').forEach(b => b.onclick = closeModal);
+    document.getElementById('modal').addEventListener('click', e => e.target === document.getElementById('modal') && closeModal());
+    document.querySelectorAll('.cancel-modal').forEach(b => b.onclick = closeModal);
 
-    // ====================== SAVE MODAL ======================
+    // ══════════════════ SAVE MODAL ══════════════════
     document.getElementById('save-modal').onclick = async () => {
         const title = document.getElementById('input-title').value.trim();
-        if(!title && currentAction!=='assessment') return alert('Judul wajib diisi!');
+        if (!title && currentAction !== 'assessment') { showToast('Title is required!', 'error'); return; }
 
         let payload = {}, url, method;
 
-        if(['section','subsection','unit'].includes(currentAction)){
+        if (['section','subsection','unit'].includes(currentAction)) {
             payload = { title, courses: courseId };
-            if(currentAction!=='section' && currentTarget) payload.parent = currentTarget.dataset.id;
-            url = currentEditId ? `${API.sections}${currentEditId}/` : API.sections;
+            if (currentAction !== 'section' && currentTarget) payload.parent = currentTarget.dataset.id;
+            url    = currentEditId ? `${API.sections}${currentEditId}/` : API.sections;
             method = currentEditId ? 'PATCH' : 'POST';
         }
-        if(currentAction==='material'){
-            const editor = document.querySelector('.ck-editor__editable');
-            const description = editor && editor.ckeditorInstance ? editor.ckeditorInstance.getData() : '';
+        if (currentAction === 'material') {
+            const ed = document.querySelector('.ck-editor__editable');
+            const description = ed?.ckeditorInstance ? ed.ckeditorInstance.getData() : '';
             payload = { title, description, section: currentTarget.dataset.id };
-            url = currentEditId ? `${API.materials}${currentEditId}/` : API.materials;
+            url    = currentEditId ? `${API.materials}${currentEditId}/` : API.materials;
             method = currentEditId ? 'PATCH' : 'POST';
         }
-        if(currentAction==='assessment'){
-            payload = { name: title, weight: document.getElementById('input-weight').value||0, section: currentTarget.dataset.id };
-            url = currentEditId ? `${API.assessments}${currentEditId}/` : API.assessments;
+        if (currentAction === 'assessment') {
+            payload = { name: title, weight: document.getElementById('input-weight').value || 0, section: currentTarget.dataset.id };
+            url    = currentEditId ? `${API.assessments}${currentEditId}/` : API.assessments;
             method = currentEditId ? 'PATCH' : 'POST';
         }
 
-        try{
+        const saveBtn = document.getElementById('save-modal');
+        saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+        try {
             const res = await fetch(url, {
                 method,
-                headers: {'Content-Type':'application/json','X-CSRFToken':csrftoken},
+                headers: { 'Content-Type':'application/json', 'X-CSRFToken':csrftoken },
                 body: JSON.stringify(payload)
             });
-            if(res.ok){
+            if (res.ok) {
                 closeModal();
                 await fetchSections();
-                showToast(currentEditId ? `${currentAction} updated!` : `${currentAction} created!`);
+                showToast(currentEditId ? `${labelMap(currentAction)} updated!` : `${labelMap(currentAction)} created!`);
             } else {
-                showToast('Gagal menyimpan', 'error');
+                showToast('Failed to save', 'error');
             }
-        } catch(e){
-            showToast('Error jaringan', 'error');
-            console.error(e);
+        } catch(e) {
+            showToast('Network error', 'error');
+        } finally {
+            saveBtn.disabled = false; saveBtn.textContent = 'Save';
         }
+
+        function labelMap(a){ const m={section:'Section',subsection:'Subsection',unit:'Unit',material:'Material',assessment:'Assessment'}; return m[a]||a; }
     };
 
-    // ====================== ESCAPE ======================
-    function escape(str){ return String(str)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#39;"); }
+    // ══════════════════ ESCAPE UTILS ══════════════════
+    function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+    function escAttr(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-    function setupInlineEdit(div, selector){
-        const label = div.querySelector(selector);
-        const input = div.querySelector('input[type="text"]');
-        const btn = div.querySelector('.edit');
-        if(!label || !input || !btn) return;
-        btn.onclick = ()=>{
-            label.classList.add('hidden');
-            input.classList.remove('hidden'); input.focus(); input.select();
+    // ══════════════════ INLINE EDIT ══════════════════
+    function setupInlineEdit(container, labelSelector) {
+        const label = container.querySelector(labelSelector);
+        const input = container.querySelector('.inline-edit-input');
+        const btn   = container.querySelector('.btn-inline-edit');
+        if (!label || !input || !btn) return;
+
+        btn.onclick = () => {
+            input.value = label.textContent.trim();
+            label.style.display = 'none';
+            input.style.display = 'inline-block';
+            input.focus(); input.select();
         };
-        input.onblur = async ()=>{
+        const commit = async () => {
             const v = input.value.trim();
-            if(!v || v===label.textContent.trim()) return label.classList.remove('hidden'), input.classList.add('hidden');
-            label.textContent=v; label.classList.remove('hidden'); input.classList.add('hidden');
-            try{
-                await fetch(`${API.sections}${div.dataset.id}/`,{
-                    method:'PATCH',
-                    headers:{'Content-Type':'application/json','X-CSRFToken':csrftoken},
-                    body:JSON.stringify({title:v})
+            input.style.display = 'none'; label.style.display = '';
+            if (!v || v === label.textContent.trim()) return;
+            label.textContent = v;
+            try {
+                await fetch(`${API.sections}${container.dataset.id}/`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type':'application/json', 'X-CSRFToken':csrftoken },
+                    body: JSON.stringify({ title: v })
                 });
                 showToast('Updated!');
-            }catch(e){ showToast('Gagal update', 'error'); }
+            } catch { showToast('Update failed', 'error'); }
         };
-        input.onkeydown = e=>{
-            if(e.key==='Enter') input.blur();
-            if(e.key==='Escape'){ input.value=label.textContent; input.blur(); }
+        input.onblur = commit;
+        input.onkeydown = e => {
+            if (e.key === 'Enter') input.blur();
+            if (e.key === 'Escape') { input.value = label.textContent; input.blur(); }
         };
     }
 
-    // ====================== CREATE SECTION ======================
-    function createSection(data){
-        const div=document.createElement('div');
-        div.className='bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden';
-        div.dataset.id=data.id;
-        div.innerHTML=`
-            <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 hover:bg-gray-50 group">
-                <div class="flex items-center gap-3 flex-1 min-w-0">
-                    <button class="toggle text-gray-500 hover:text-gray-700"><i class="fas fa-chevron-right text-lg transition"></i></button>
-                    <span class="section-label font-semibold text-gray-900 truncate pr-2">${escape(data.title)}</span>
-                    <input type="text" class="hidden w-full px-3 py-1.5 border border-gray-300 rounded text-sm" value="${escape(data.title)}">
-                    <button class="edit text-gray-400 hover:text-blue-600 text-sm"><i class="fas fa-edit"></i></button>
-                </div>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button class="add-sub text-xs sm:text-sm px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">+ Subsection</button>
-                    <button class="delete-section text-red-600 hover:text-red-800 text-lg"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-            <div class="subsection-list"></div>
-        `;
-        const list=div.querySelector('.subsection-list');
-        data.children?.forEach(c=>list.appendChild(createSubsection(c)));
+    // ══════════════════ BUILD SECTION ══════════════════
+    function createSection(data) {
+        const card = document.createElement('div');
+        card.className = 'section-card';
+        card.dataset.id = data.id;
 
-        div.querySelector('.toggle').onclick=()=>{
-            list.classList.toggle('hidden');
-            div.querySelector('.toggle i').classList.toggle('fa-chevron-down');
-            div.querySelector('.toggle i').classList.toggle('fa-chevron-right');
+        card.innerHTML = `
+        <div class="section-header">
+          <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+          <button class="toggle-btn open"><i class="fas fa-chevron-right"></i></button>
+          <div class="header-label">
+            
+            <span class="label-text section">${esc(data.title)}</span>
+            <input class="inline-edit-input" type="text" value="${esc(data.title)}">
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost btn-xs btn-inline-edit" title="Rename"><i class="fas fa-pencil-alt"></i></button>
+            <button class="btn btn-secondary btn-xs add-sub"><i class="fas fa-plus"></i> Subsection</button>
+            <button class="btn btn-danger btn-xs delete-section" title="Delete section"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+        <div class="section-body subsection-list"></div>`;
+
+        const body = card.querySelector('.section-body');
+        (data.children || []).forEach(c => body.appendChild(createSubsection(c)));
+
+        // Toggle
+        const toggleBtn = card.querySelector('.toggle-btn');
+        toggleBtn.onclick = () => {
+            body.classList.toggle('collapsed');
+            toggleBtn.classList.toggle('open');
         };
-        div.querySelector('.add-sub').onclick=()=>openModal('subsection', div);
-        div.querySelector('.delete-section').onclick=()=>deleteSection(data.id);
-        setupInlineEdit(div,'.section-label');
-        makeSortable(list);
-        return div;
+
+        card.querySelector('.add-sub').onclick = () => openModal('subsection', card);
+        card.querySelector('.delete-section').onclick = () => deleteSection(data.id);
+        setupInlineEdit(card, '.label-text');
+        makeSortable(body, 'subsection');
+        return card;
     }
 
-    // ====================== CREATE SUBSECTION ======================
-    function createSubsection(data){
-        const div=document.createElement('div');
-        div.className='ml-4 sm:ml-8 my-3 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden';
-        div.dataset.id=data.id;
-        div.innerHTML=`
-            <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 hover:bg-gray-50 group">
-                <div class="flex items-center gap-3 flex-1">
-                    <button class="toggle text-gray-500 hover:text-gray-700"><i class="fas fa-chevron-right"></i></button>
-                    <span class="sub-label font-medium text-gray-800">${escape(data.title)}</span>
-                    <input type="text" class="hidden w-full px-3 py-1.5 border border-gray-300 rounded text-sm" value="${escape(data.title)}">
-                    <button class="edit text-gray-400 hover:text-blue-600 text-sm"><i class="fas fa-edit"></i></button>
-                </div>
-                <div class="flex gap-2">
-                    <button class="add-unit text-xs px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">+ Unit</button>
-                    <button class="delete-section text-red-600 hover:text-red-800 text-lg"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-            <div class="unit-list space-y-4 p-4 hidden"></div>
-        `;
-        const list=div.querySelector('.unit-list');
-        data.children?.forEach(u=>list.appendChild(createUnit(u)));
+    // ══════════════════ BUILD SUBSECTION ══════════════════
+    function createSubsection(data) {
+        const card = document.createElement('div');
+        card.className = 'subsection-card';
+        card.dataset.id = data.id;
 
-        div.querySelector('.toggle').onclick=()=>list.classList.toggle('hidden');
-        div.querySelector('.add-unit').onclick=()=>openModal('unit', div);
-        div.querySelector('.delete-section').onclick=()=>deleteSection(data.id);
-        setupInlineEdit(div,'.sub-label');
-        makeSortable(list);
-        return div;
+        card.innerHTML = `
+        <div class="subsection-header">
+          <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+          <button class="toggle-btn open"><i class="fas fa-chevron-right"></i></button>
+          <div class="header-label">
+            
+            <span class="label-text subsection">${esc(data.title)}</span>
+            <input class="inline-edit-input" type="text" value="${esc(data.title)}">
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost btn-xs btn-inline-edit" title="Rename"><i class="fas fa-pencil-alt"></i></button>
+            <button class="btn btn-secondary btn-xs add-unit"><i class="fas fa-plus"></i> Unit</button>
+            <button class="btn btn-danger btn-xs delete-section" title="Delete subsection"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+        <div class="subsection-body unit-list"></div>`;
+
+        const body = card.querySelector('.subsection-body');
+        (data.children || []).forEach(u => body.appendChild(createUnit(u)));
+
+        card.querySelector('.toggle-btn').onclick = () => {
+            body.classList.toggle('collapsed');
+            card.querySelector('.toggle-btn').classList.toggle('open');
+        };
+        card.querySelector('.add-unit').onclick = () => openModal('unit', card);
+        card.querySelector('.delete-section').onclick = () => deleteSection(data.id);
+        setupInlineEdit(card, '.label-text');
+        makeSortable(body, 'unit');
+        return card;
     }
 
-    function escapeHtmlAttr(str){
-        return String(str)
-            .replace(/&/g,"&amp;")
-            .replace(/"/g,"&quot;")
-            .replace(/'/g,"&#39;")
-            .replace(/</g,"&lt;")
-            .replace(/>/g,"&gt;");
-    }
+    // ══════════════════ BUILD UNIT ══════════════════
+    function createUnit(data) {
+        const card = document.createElement('div');
+        card.className = 'unit-card';
+        card.dataset.id = data.id;
 
-    function createUnit(data){
-        const div = document.createElement('div');
-        div.className = 'bg-gray-50 rounded-xl p-4 border border-gray-200';
-        div.dataset.id = data.id;
-
+        // Figure out section id from children
         let sectionId = null;
-        if(data.assessments?.length>0) sectionId = data.assessments[0].section;
-        else if(data.materials?.length>0) sectionId = data.materials[0].section;
+        if (data.assessments?.length > 0) sectionId = data.assessments[0].section;
+        else if (data.materials?.length > 0) sectionId = data.materials[0].section;
 
-        // === Assessments ===
-        const asses = (data.assessments || []).map(a=>{
-            const weightBadge = a.weight ? `<span class="text-xs bg-purple-100 px-2 py-1 rounded ml-2">${a.weight}%</span>` : '';
-            const viewUrl = `/questions/view/${courseId}/${sectionId}/${a.id}/`;
-            const liveUrl = `/self_course/${currentUser}/${courseId}/${courseSlug}/?assessment_id=${a.id}`;
-            const encodedItem = escapeHtmlAttr(encodeURIComponent(JSON.stringify(a)));
-
-            return `<div class="flex flex-col sm:flex-row justify-between items-center py-4 border-b last:border-0 gap-4 hover:bg-purple-50 rounded-lg transition-all group">
-                        <a href="${viewUrl}" class="flex items-center gap-3 text-sm font-medium text-purple-800 hover:text-purple-900 flex-1 truncate">
-                            <i class="fas fa-clipboard-check text-purple-600"></i>
-                            <span class="truncate">${escape(a.name)}</span> ${weightBadge}
-                            <i class="fas fa-arrow-right text-xs ml-2 opacity-0 group-hover:opacity-100 transition"></i>
-                        </a>
-                        <div class="flex items-center gap-5 text-xs font-medium">
-                            <a href="${liveUrl}" class="text-green-600 font-bold hover:text-green-700 hover:underline">live</a>
-                            <button type="button" class="edit-assessment text-blue-600 hover:underline" data-id="${a.id}" data-item="${encodedItem}">Edit</button>
-                            <button type="button" class="delete-assessment text-red-600 hover:underline" data-url="${API.assessments}${a.id}/">delete</button>
-                        </div>
-                    </div>`;
-        }).join('');
-
-        // === Materials ===
-        const mats = (data.materials || []).map(m=>{
-            const liveUrl = `/self_course/${currentUser}/${courseId}/${courseSlug}/?material_id=${m.id}`;
-            const encodedItem = escapeHtmlAttr(encodeURIComponent(JSON.stringify(m)));
-
-            return `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b last:border-0 gap-2">
-                        <div class="flex items-center gap-2 text-sm"><i class="fas fa-file-alt text-green-600"></i> ${escape(m.title)}</div>
-                        <div class="flex gap-3 text-xs">
-                            <a href="${liveUrl}" class="text-blue-600 font-bold hover:text-blue-700 hover:underline">Live</a>
-                            <button type="button" class="edit-material text-blue-600 hover:underline" data-id="${m.id}" data-item="${encodedItem}">Edit</button>
-                            <button type="button" class="delete-material text-red-600 hover:underline" data-url="${API.materials}${m.id}/">delete</button>
-                        </div>
-                    </div>`;
-        }).join('');
-
-        div.innerHTML = `
-            <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4">
-                <div class="flex items-center gap-2 flex-1">
-                    <span class="unit-label font-semibold text-gray-900">${escape(data.title)}</span>
-                    <button type="button" class="edit text-gray-400 hover:text-blue-600 text-sm"><i class="fas fa-edit"></i></button>
-                    <input type="text" class="hidden w-full px-3 py-1.5 border border-gray-300 rounded text-sm" value="${escape(data.title)}">
+        // Materials HTML
+        const matsHtml = (data.materials || []).map(m => {
+            const liveUrl    = `/self_course/${currentUser}/${courseId}/${courseSlug}/?material_id=${m.id}`;
+            const encodedItem = escAttr(encodeURIComponent(JSON.stringify(m)));
+            return `<div class="xblock-row">
+                <i class="fas fa-file-alt xblock-icon material"></i>
+                <span class="xblock-name">${esc(m.title)}</span>
+                <div class="xblock-actions">
+                  <a href="${liveUrl}" class="action-link live" title="Preview live"><i class="fas fa-external-link-alt"></i> Live</a>
+                  <button type="button" class="action-link edit edit-material" data-id="${m.id}" data-item="${encodedItem}"><i class="fas fa-edit"></i> Edit</button>
+                  <button type="button" class="action-link delete delete-material" data-url="${API.materials}${m.id}/"><i class="fas fa-trash"></i></button>
                 </div>
-                <button type="button" class="delete-section text-red-600 hover:text-red-800 text-lg"><i class="fas fa-trash"></i></button>
-            </div>
-            ${mats ? `<div class="mb-4"><div class="font-medium text-gray-700 text-sm mb-2">Materials</div>${mats}</div>` : ''}
-            ${asses ? `<div class="mb-4"><div class="font-medium text-gray-700 text-sm mb-2">Assessments</div><div class="space-y-2">${asses}</div></div>` : ''}
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                <button type="button" class="add-material-btn py-2.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 text-sm font-medium">+ Material</button>
-                <button type="button" class="add-assessment-btn py-2.5 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 text-sm font-medium">+ Assessment</button>
-            </div>
-        `;
+              </div>`;
+        }).join('');
 
-        div.querySelectorAll('button').forEach(btn => btn.addEventListener('click', e => e.stopPropagation()));
+        // Assessments HTML
+        const assessHtml = (data.assessments || []).map(a => {
+            const viewUrl    = `/questions/view/${courseId}/${sectionId}/${a.id}/`;
+            const liveUrl    = `/self_course/${currentUser}/${courseId}/${courseSlug}/?assessment_id=${a.id}`;
+            const encodedItem = escAttr(encodeURIComponent(JSON.stringify(a)));
+            const weightBadge = a.weight ? `<span class="weight-badge">${a.weight}%</span>` : '';
+            return `<div class="xblock-row">
+                <i class="fas fa-clipboard-check xblock-icon assessment"></i>
+                <a href="${viewUrl}" class="xblock-name" style="color:var(--studio-purple);text-decoration:none;" title="View questions">${esc(a.name)}</a>
+                ${weightBadge}
+                <div class="xblock-actions">
+                  <a href="${liveUrl}" class="action-link live"><i class="fas fa-external-link-alt"></i> Live</a>
+                  <button type="button" class="action-link edit edit-assessment" data-id="${a.id}" data-item="${encodedItem}"><i class="fas fa-edit"></i> Edit</button>
+                  <button type="button" class="action-link delete delete-assessment" data-url="${API.assessments}${a.id}/"><i class="fas fa-trash"></i></button>
+                </div>
+              </div>`;
+        }).join('');
 
-        // === Event Edit Material ===
-        div.querySelectorAll('.edit-material').forEach(btn => btn.addEventListener('click', ()=>{
-            const item = JSON.parse(decodeURIComponent(btn.dataset.item));
-            openModal('material', div, btn.dataset.id, item);
-        }));
+        const matBlock  = matsHtml   ? `<div class="content-block"><div class="content-block-title"><i class="fas fa-file-alt" style="color:var(--studio-green)"></i> Materials</div>${matsHtml}</div>` : '';
+        const assBlock  = assessHtml ? `<div class="content-block"><div class="content-block-title"><i class="fas fa-clipboard-check" style="color:var(--studio-purple)"></i> Assessments</div>${assessHtml}</div>` : '';
 
-        // === Event Delete Material ===
-        div.querySelectorAll('.delete-material').forEach(btn => btn.addEventListener('click', ()=>{
-            if(confirm('Hapus material ini?')) deleteItem(btn.dataset.url);
-        }));
+        card.innerHTML = `
+        <div class="unit-header">
+          <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span>
+          <div class="unit-title">
+            <i class="fas fa-cube" style="color:var(--studio-unit-bar);font-size:12px"></i>
+            <span class="label-text">${esc(data.title)}</span>
+            <input class="inline-edit-input" type="text" value="${esc(data.title)}">
+          </div>
+          <div class="unit-actions">
+            <button type="button" class="btn btn-ghost btn-xs btn-inline-edit" title="Rename"><i class="fas fa-pencil-alt"></i></button>
+            <button type="button" class="btn btn-danger btn-xs delete-section" title="Delete unit"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+        <div class="unit-content">
+          ${matBlock}${assBlock}
+          <div class="add-content-row">
+            <button type="button" class="btn-add-material add-material-btn"><i class="fas fa-plus"></i> Add Material</button>
+            <button type="button" class="btn-add-assessment add-assessment-btn"><i class="fas fa-plus"></i> Add Assessment</button>
+          </div>
+        </div>`;
 
-        // === Event Edit Assessment ===
-        div.querySelectorAll('.edit-assessment').forEach(btn => btn.addEventListener('click', ()=>{
-            const item = JSON.parse(decodeURIComponent(btn.dataset.item));
-            openModal('assessment', div, btn.dataset.id, item);
-        }));
+        // Stop propagation on all buttons
+        card.querySelectorAll('button').forEach(b => b.addEventListener('click', e => e.stopPropagation()));
 
-        // === Event Delete Assessment ===
-        div.querySelectorAll('.delete-assessment').forEach(btn => btn.addEventListener('click', ()=>{
-            if(confirm('Hapus assessment ini?')) deleteItem(btn.dataset.url);
-        }));
+        card.querySelectorAll('.edit-material').forEach(b => b.onclick = () => {
+            const item = JSON.parse(decodeURIComponent(b.dataset.item));
+            openModal('material', card, b.dataset.id, item);
+        });
+        card.querySelectorAll('.delete-material').forEach(b => b.onclick = () => {
+            if (confirm('Delete this material?')) deleteItem(b.dataset.url);
+        });
+        card.querySelectorAll('.edit-assessment').forEach(b => b.onclick = () => {
+            const item = JSON.parse(decodeURIComponent(b.dataset.item));
+            openModal('assessment', card, b.dataset.id, item);
+        });
+        card.querySelectorAll('.delete-assessment').forEach(b => b.onclick = () => {
+            if (confirm('Delete this assessment?')) deleteItem(b.dataset.url);
+        });
+        card.querySelector('.add-material-btn')?.addEventListener('click', () => openModal('material', card));
+        card.querySelector('.add-assessment-btn')?.addEventListener('click', () => openModal('assessment', card));
+        card.querySelector('.delete-section')?.addEventListener('click', () => deleteSection(data.id));
+        setupInlineEdit(card, '.label-text');
 
-        div.querySelector('.add-material-btn')?.addEventListener('click', ()=>openModal('material', div));
-        div.querySelector('.add-assessment-btn')?.addEventListener('click', ()=>openModal('assessment', div));
-        div.querySelector('.delete-section')?.addEventListener('click', ()=>deleteSection(data.id));
-
-        setupInlineEdit(div, '.unit-label');
-
-        return div;
+        return card;
     }
 
-
-
-    // ====================== FETCH / DELETE ======================
-    async function fetchSections(){
-        try{
-            const res=await fetch(`${API.sections}?course=${courseId}`);
-            const data=await res.json();
-            const container=document.getElementById('sections');
-            container.innerHTML='';
-            data.forEach(s=>container.appendChild(createSection(s)));
-            makeSortable(container);
-        }catch(e){
-            showToast('Error fetching sections', 'error');
+    // ══════════════════ FETCH / DELETE ══════════════════
+    async function fetchSections() {
+        try {
+            const res  = await fetch(`${API.sections}?course=${courseId}`);
+            const data = await res.json();
+            const container = document.getElementById('sections');
+            container.innerHTML = '';
+            if (data.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+            } else {
+                document.getElementById('empty-state').classList.add('hidden');
+                data.forEach(s => container.appendChild(createSection(s)));
+            }
+            makeSortable(container, 'section');
+        } catch(e) {
+            showToast('Failed to load sections', 'error');
             console.error(e);
         }
     }
 
-    async function deleteSection(id){
-        if(confirm('Hapus beserta semua isinya?')){
-            await fetch(`${API.sections}${id}/`,{method:'DELETE',headers:{'X-CSRFToken':csrftoken}});
+    async function deleteSection(id) {
+        if (confirm('Delete this item and all its contents?')) {
+            await fetch(`${API.sections}${id}/`, { method:'DELETE', headers:{'X-CSRFToken':csrftoken} });
             await fetchSections();
-            showToast('Section deleted!');
+            showToast('Deleted!');
         }
     }
 
-    async function deleteItem(url){
-        if(confirm('Hapus?')){
-            await fetch(url,{method:'DELETE',headers:{'X-CSRFToken':csrftoken}});
-            await fetchSections();
-            showToast('Deleted successfully!');
-        }
+    async function deleteItem(url) {
+        await fetch(url, { method:'DELETE', headers:{'X-CSRFToken':csrftoken} });
+        await fetchSections();
+        showToast('Deleted!');
     }
 
-    function makeSortable(el){
-        if(el) new Sortable(el,{group:'nested',animation:150,fallbackOnBody:true,swapThreshold:0.65,onEnd:saveStructure});
+    // ══════════════════ SORTABLE ══════════════════
+    function makeSortable(el, type) {
+        if (!el) return;
+        const groupMap = { section: 'sections', subsection: 'subsections', unit: 'units' };
+        new Sortable(el, {
+            group: groupMap[type] || 'nested',
+            animation: 160,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            fallbackOnBody: true,
+            swapThreshold: 0.65,
+            onEnd: saveStructure
+        });
     }
 
-    async function saveStructure(){
-        const getData=el=>({id:el.dataset.id, children:[...el.querySelectorAll(':scope > .subsection-list > div, :scope > .unit-list > div')].map(getData)});
-        const container=document.getElementById('sections');
-        const payload=[...container.children].map(getData);
-        try{
-            await fetch(API.reorder,{
-                method:'POST',
-                headers:{'Content-Type':'application/json','X-CSRFToken':csrftoken},
-                body:JSON.stringify(payload)
+    async function saveStructure() {
+        const getData = el => ({
+            id: el.dataset.id,
+            children: [...el.querySelectorAll(':scope > .subsection-list > div, :scope > .unit-list > div')].map(getData)
+        });
+        const container = document.getElementById('sections');
+        const payload   = [...container.children].map(getData);
+        try {
+            await fetch(API.reorder, {
+                method: 'POST',
+                headers: { 'Content-Type':'application/json', 'X-CSRFToken':csrftoken },
+                body: JSON.stringify(payload)
             });
-            showToast('Reorder saved!');
-        }catch(e){ showToast('Gagal menyimpan reorder', 'error'); console.error(e); }
+            showToast('Order saved!');
+        } catch { showToast('Failed to save order', 'error'); }
     }
-    document.getElementById('add-section').addEventListener('click', () => openModal('section'));
-    document.getElementById('save-json').addEventListener('click', saveStructure);
+
+    // ══════════════════ INIT ══════════════════
+    document.getElementById('add-section').onclick = () => openModal('section');
+    document.getElementById('save-json').onclick   = saveStructure;
+    document.getElementById('empty-add-section')?.addEventListener('click', () => openModal('section'));
+
     fetchSections();
 });
 </script>
-
-
-
-<style>
-.hidden { display: none !important; }
-.ck-editor__editable { min-height: 450px !important; }
-</style>
 
 {% endblock %}
